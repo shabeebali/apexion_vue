@@ -45,8 +45,7 @@
         },
         methods:{
             editItem($event){
-                this.editId=$event
-                this.editDialog = true
+                this.$router.push('products/edit/'+$event.id)
             },
             redirectAdd(){
                 this.$router.push('add')
