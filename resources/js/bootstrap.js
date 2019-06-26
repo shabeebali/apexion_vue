@@ -23,7 +23,7 @@ try {
 window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.baseURL = 'http://localhost/apexion/public/api';
+window.axios.defaults.baseURL = 'http://localhost/apexion/api';
 /**
  * Next we will register the CSRF Token as a common header with Axios so that
  * all outgoing HTTP requests automatically have it attached. This is just
@@ -61,5 +61,5 @@ if (token) {
      key: '5d4efb0d3073bcdece3a',
      cluster: 'ap2',
      encrypted: true,
-     authEndpoint: '/apexion/public/broadcasting/auth',
+     authEndpoint: '/apexion/broadcasting/auth',
  });

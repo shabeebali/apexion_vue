@@ -12,10 +12,10 @@ Vue.use(Vuetify)
 Vue.use(VueRouter)
 const router = new VueRouter({
   routes,
-  base:'/apexion/public/admin',
+  base:'/apexion/admin',
   mode:'history',
 });
-Vue.prototype.$asset = '/apexion/public'
+Vue.prototype.$asset = '/apexion/'
 Vue.mixin({
   methods: {
     confirmDialog(msg) {
