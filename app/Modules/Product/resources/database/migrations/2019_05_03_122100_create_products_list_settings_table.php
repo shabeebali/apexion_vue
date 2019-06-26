@@ -17,6 +17,7 @@ class CreateProductsListSettingsTable extends Migration
             $table->bigIncrements('id');
             $table->string('value');
             $table->bigInteger('user_id');
+            $table->timestamps();
         });
     }
 
