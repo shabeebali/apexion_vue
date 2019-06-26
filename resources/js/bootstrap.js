@@ -1,4 +1,4 @@
-
+    
 window._ = require('lodash');
 
 /**
@@ -23,7 +23,7 @@ try {
 window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.baseURL = 'http://localhost/apexion/api';
+window.axios.defaults.baseURL = 'http://apexiondental.com/erp/api';
 /**
  * Next we will register the CSRF Token as a common header with Axios so that
  * all outgoing HTTP requests automatically have it attached. This is just
