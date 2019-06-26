@@ -18,8 +18,8 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        'App\Modules\Product\Events\ProductAddFormGenerated' => [
-            'App\Modules\ProductCode\Listeners\ModifyProductAddForm'
+        'App\Modules\Product\Events\SampleEvent' => [
+            'App\Modules\Product\Listeners\SampleListener'
         ],
     ];
 

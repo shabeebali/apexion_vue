@@ -1,10 +1,13 @@
 <template>
     <v-content style="">
-        <v-container fluid>
+        <div>
+            <v-breadcrumbs :items="breadcrumbs" divider=">"></v-breadcrumbs>
+        </div>
+        <v-container fluid class="pt-0">
             <v-toolbar color="white" tabs>
                 <v-toolbar-title>Add Product</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn color="primary">Add</v-btn>
+                <v-btn color="primary" @click="add">Add</v-btn>
                 <template v-slot:extension>
                     <v-tabs v-model="tab" color="white" grow >
                         <v-tabs-slider color="yellow"></v-tabs-slider>
@@ -40,9 +43,6 @@
                                     <v-select label="GST" :items="formdata.gst.options" v-model="formdata.gst.value" ></v-select>
                                 </v-flex>
                                 <v-flex lg3 md6 xs12 px-2>
-                                    <v-text-field label="Stock" v-model="formdata.stock.value" type="text" :error-messages="formdata.stock.error"></v-text-field>
-                                </v-flex>
-                                <v-flex lg3 md6 xs12 px-2>
                                         <v-text-field label="MRP" v-model="formdata.mrp.value" type="text" :error-messages="formdata.mrp.error"></v-text-field>
                                 </v-flex>
                                 <v-flex lg3 md6 xs12 px-2>
@@ -55,7 +55,7 @@
                                     <v-text-field label="General Selling Price (Dealer)" v-model="formdata.general_selling_dealer.value" type="text" :error-messages="formdata.general_selling_dealer.error"></v-text-field>
                                 </v-flex>
                                 <v-flex lg3 md6 xs12 px-2 v-for="(item,i)  in npc_category_types" :key="i">
-                                    <v-select :label="item.label" :items="item.options" :error-messages="item.error"></v-select>
+                                    <v-select :label="item.label" :items="item.options" v-model="item.value" :error-messages="item.error"></v-select>
                                 </v-flex>
                             </v-layout>
                             <v-layout row wrap>
@@ -68,6 +68,16 @@
                                     <v-textarea label="Description" v-model="formdata.description.value"></v-textarea>
                                 </v-flex>
                             </v-layout>
+                            <v-layout row wrap v-if="pendingFlag">
+                                <v-flex xs12 px-2>
+                                    <v-switch v-model="formdata.pending.value" true-value="1" false-value="0" label="Approved?"></v-switch>
+                                </v-flex>
+                            </v-layout>
+                            <v-layout row wrap v-if="tallFlag">
+                                <v-flex xs12 px-2>
+                                    <v-switch v-model="formdata.tally.value" true-value="1" false-value="0" label="Synced with Tally?"></v-switch>
+                                </v-flex>
+                            </v-layout>
                         </v-card>
                     </v-tab-item>
                     <v-tab-item >
@@ -76,7 +86,7 @@
                                 <v-flex lg6 md6 xs12>
                                     <v-layout column wrap>
                                         <v-flex px-2 v-for="(item,i) in pc_category_types" :key="i">
-                                            <v-select :label="item.label" v-model="item.value" :items="item.options" :error-messages="item.error"></v-select>
+                                            <v-combobox :label="item.label" v-model="item.value" :items="item.options" :error-messages="item.error"></v-combobox>
                                         </v-flex>
                                     </v-layout>
                                 </v-flex>
@@ -91,8 +101,28 @@
                         </v-card>
                     </v-tab-item>
                     <v-tab-item >
-                        <v-card flat>
-                            <v-card-text>{{ text }}3</v-card-text>
+                        <v-card class="pa-4" flat v-if="Object.keys(pricelist).length > 0">
+                            <v-layout row wrap v-for="(p,index) in pricelist" :key="index">
+                                <v-flex lg3 md4 sm4 xs6 px-2>
+                                    <v-text-field :label="p.name+' price margin (%)'" v-model="pricelist[index].value" 
+                                    @input="updatePricelist(index)"></v-text-field>
+                                </v-flex>
+                                <v-flex lg3 md4 sm4 xs6 px-2>
+                                    <v-text-field label="price" 
+                                    :value="calculated_price(pricelist[index].value)"
+                                    readonly 
+                                    :error-messages="p.error"></v-text-field>
+                                </v-flex>
+                            </v-layout>
+                        </v-card>
+                    </v-tab-item>
+                    <v-tab-item >
+                        <v-card class="pa-4" flat v-if="Object.keys(warehouse).length > 0">
+                            <v-layout row wrap v-for="(p,index) in warehouse" :key="index">
+                                <v-flex lg3 md4 sm4 xs6 px-2>
+                                    <v-text-field :label="'Warehouse: '+p.name" :error-messages="p.error" v-model="warehouse[index].value"></v-text-field>
+                                </v-flex>
+                            </v-layout>
                         </v-card>
                     </v-tab-item>
                 </v-tabs-items>
@@ -117,7 +147,7 @@
             <v-dialog v-model="errorDialog" hide-overlay persistent width="300">
               <v-card color="red" dark>
                 <v-card-text>
-                  Please corect the erros in the form
+                  Please correct the errors in the form
                 </v-card-text>
               </v-card>
             </v-dialog>
@@ -130,6 +160,8 @@ export default{
         return{
             loadingDialog : false,
             errorDialog:false,
+            pendingFlag:false,
+            tallFlag:false,
             formFields:[],
             addRoute:'',
             formdata:{
@@ -137,9 +169,6 @@ export default{
                     'value':'','error':''
                 },
                 'weight':{
-                    'value':'0','error':''
-                },
-                'stock':{
                     'value':'0','error':''
                 },
                 'mrp':{
@@ -163,6 +192,12 @@ export default{
                 'description':{
                     'value':'','error':''
                 },
+                'pending':{
+                    'value':0,'error':''
+                },
+                'tally':{
+                    'value':0,'error':''
+                },
                 'gst':{
                     'value':'12',
                     'options':[
@@ -174,13 +209,44 @@ export default{
             },
             pc_category_types:[],
             npc_category_types:[],
-            pricelist:null,
+            pricelist:[],
+            warehouse:[],
             tab: null,
-            tabHeads: {'General':{'error':false}, 'Product Code':{'error':false}, 'Pricelist':{'error':false}},
-            text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+            tabHeads: {
+                'General':{
+                    'error':false
+                },
+                'Product Code':{
+                    'error':false
+                },
+                'Pricelist':{
+                    'error':false
+                },
+                'Stock':{
+                    'error':false
+                }
+            },
+            breadcrumbs:[
+                    {
+                        text:'Home',
+                        disabled:false,
+                        to:'/'
+                    },
+                    {
+                        text:'Products',
+                        disabled:false,
+                        to:'/products/list'
+                    },
+                    {
+                        text:'Add',
+                        disabled:true,
+                        to:'/products/add'
+                    },  
+                ]
         }
     },
     mounted(){
+        this.loadingDialog = true
         axios.get('products/add').then((response)=>{
             if(response.status == 200){
                 if(response.data.npc_category_types !== undefined){
@@ -192,6 +258,12 @@ export default{
                 if(response.data.pricelist !== undefined){
                     this.pricelist = response.data.pricelist
                 }
+                if(response.data.warehouse !== undefined){
+                    this.warehouse = response.data.warehouse
+                }
+                this.pendingFlag = response.data.pendingflag
+                this.tallFlag = response.data.tallyflag
+                this.loadingDialog = false
             }
             else{
                 alert('Something went wrong!!')
@@ -199,34 +271,27 @@ export default{
             }
         })
     },
-    watch:{
-        formdata:{
-            handler(){
-                Object.keys(this.formdata).forEach((key)=>{
-                    if('error' in this.formdata[key]){
-                        if(this.formdata[key]['error'].length > 0){
-                            this.tabHeads.General.error=true
-                            return false
-                        }
-                    }
-                })
-            },
-            deep:true
+    computed:{
+        mrp(){
+            return this.formdata.mrp.value
         },
-        pc_category_types:{
-            handler(){
-                Object.keys(this.pc_category_types).forEach((key)=>{
-                    if('error' in this.pc_category_types[key]){
-                        if(this.pc_category_types[key]['error'].length > 0){
-                            this.tabHeads['Product Code'].error = true
-                        }
-                    }
-                })
-            },
-            deep:true
+        landing_price(){
+            return this.formdata.landing_price.value
+        },
+        gst(){
+            return this.formdata.gst.value
         }
     },
-    components:{
+    watch:{
+        mrp(){
+            this.updatePricelist()
+        },
+        landing_price(){
+            this.updatePricelist()
+        },
+        gst(){
+            this.updatePricelist()
+        }
     },
     methods:{
         add(){
@@ -236,7 +301,36 @@ export default{
                 fD.append(key,this.formdata[key]['value'])
             })
             Object.keys(this.pc_category_types).forEach((key)=>{
-                fD.append(key,this.pc_category_types[key]['value'])
+                if(this.pc_category_types[key]['value'].value !== undefined){
+                    fD.append(key,this.pc_category_types[key]['value'].value) //combobox
+                }
+                else{
+                    fD.append(key,'')
+                }
+            })
+            Object.keys(this.npc_category_types).forEach((key)=>{
+                if(this.npc_category_types[key]['value'] !== undefined){
+                    fD.append(key,this.npc_category_types[key]['value']) //select
+                }
+                else{
+                    fD.append(key,'')
+                }
+            })
+            Object.keys(this.pricelist).forEach((key)=>{
+                if(this.pricelist[key]['value'] !== undefined){
+                    fD.append(key,this.pricelist[key]['value']) //select
+                }
+                else{
+                    fD.append(key,'')
+                }
+            })
+            Object.keys(this.warehouse).forEach((key)=>{
+                if(this.warehouse[key]['value'] !== undefined){
+                    fD.append(key,this.warehouse[key]['value']) //select
+                }
+                else{
+                    fD.append(key,'')
+                }
             })
             axios.post('products/add',fD).then((response)=>{
 
@@ -252,11 +346,43 @@ export default{
                         if(this.formdata[key] !== undefined){
                             this.formdata[key]['error'] = response.data.errors[key]
                         }
-                        else if(this.pc_category_types[key] !== undefined){
+                        if(this.pc_category_types[key] !== undefined){
                             this.pc_category_types[key]['error'] = response.data.errors[key]
                         }
-                        else{
-
+                        if(this.npc_category_types[key] !== undefined){
+                            this.npc_category_types[key]['error'] = response.data.errors[key]
+                        }
+                        if(this.warehouse[key] !== undefined){
+                            this.warehouse[key]['error'] = response.data.errors[key]
+                        }
+                    })
+                    Object.keys(this.formdata).forEach((key)=>{
+                        if('error' in this.formdata[key]){
+                            if(this.formdata[key]['error'].length > 0){
+                                this.tabHeads.General.error=true
+                                return false
+                            }
+                        }
+                    })
+                    Object.keys(this.pc_category_types).forEach((key)=>{
+                        if('error' in this.pc_category_types[key]){
+                            if(this.pc_category_types[key]['error'].length > 0){
+                                this.tabHeads['Product Code'].error = true
+                            }
+                        }
+                    })
+                    Object.keys(this.npc_category_types).forEach((key)=>{
+                        if('error' in this.npc_category_types[key]){
+                            if(this.npc_category_types[key]['error'].length > 0){
+                                this.tabHeads['General'].error = true
+                            }
+                        }
+                    })
+                    Object.keys(this.warehouse).forEach((key)=>{
+                        if('error' in this.warehouse[key]){
+                            if(this.warehouse[key]['error'].length > 0){
+                                this.tabHeads['Stock'].error = true
+                            }
                         }
                     })
                     setTimeout(()=>{
@@ -275,6 +401,31 @@ export default{
             Object.keys(this.pc_category_types).forEach((key)=>{
                 this.pc_category_types[key]['error'] = ''
             })
+            Object.keys(this.npc_category_types).forEach((key)=>{
+                this.npc_category_types[key]['error'] = ''
+            })
+            Object.keys(this.warehouse).forEach((key)=>{
+                this.warehouse[key]['error'] = ''
+            })
+        },
+        calculated_price(el){
+            return ((parseFloat(this.formdata.landing_price.value)*((parseFloat(el)/100)+1))*((parseFloat(this.formdata.gst.value)/100)+1)).toFixed(2)
+        },
+        updatePricelist(index = null){
+            if(index !== null){
+                this.pricelist[index].error = ''
+                if(this.calculated_price(this.pricelist[index].value) > parseFloat(this.formdata.mrp.value)){
+                    this.pricelist[index].error = 'Warning: This price exceeded MRP'
+                }
+            }
+            else{
+                Object.keys(this.pricelist).forEach((index)=>{
+                    this.pricelist[index].error = ''
+                    if(this.calculated_price(this.pricelist[index].value) > parseFloat(this.formdata.mrp.value)){
+                        this.pricelist[index].error = 'Warning: This price exceeded MRP'
+                    }
+                })
+            }
         }
     }
 }

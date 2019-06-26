@@ -10,4 +10,8 @@ class Category extends Model
     {
         return $this->belongsTo('App\Modules\Taxonomy\Models\CategoryType');
     }
+    public function products()
+    {
+        return $this->belongsToMany('App\Modules\Product\Models\Product','category_product','category_id','product_id');
+    }
 }

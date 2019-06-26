@@ -23,20 +23,9 @@ export default{
             var token = localStorage.token;
             window.axios.defaults.headers.common['Authorization'] = 'Bearer '+ token;
             axios.get('/validate_token').then((response)=>{
-                if(response.status !== 200){
-                    var bu_length = window.axios.defaults.baseURL.length;
-                    window.location = window.axios.defaults.baseURL.substr(0,bu_length-3)+"login";
-                }
-                else{
-                    console.log('token authenticated');
-                }
+                console.log('token authenticated');
                 this.getMainMenu();
-            }).catch(function(error){
-                console.log(error);
-                alert('wrong2');
-                var bu_length = window.axios.defaults.baseURL.length;
-                window.location = window.axios.defaults.baseURL.substr(0,bu_length-3)+"login";
-            });
+            })
         }
         else{
             var bu_length = window.axios.defaults.baseURL.length;
@@ -46,15 +35,8 @@ export default{
                     localStorage.setItem('token', token);
                     window.axios.defaults.headers.common['Authorization'] = 'Bearer '+token;
                 }
-                else{
-                    window.location = window.axios.defaults.baseURL.substr(0,bu_length-3)+"login";
-                }
                 this.getMainMenu();
-            }).catch(function(error){
-                console.log(error);
-                alert('wrong');
-                window.location = window.axios.defaults.baseURL.substr(0,bu_length-3)+"login";
-            });
+            })
         }
     },
     methods:{
@@ -63,11 +45,7 @@ export default{
                 if(response.data){
                     this.main_menu_items = response.data
                 }
-            }).catch(function(error){
-                alert('Somethig went wrong!!!');
-                console.log(error.response.status);
-                console.log(error.response);
-            });
+            })
             return true;
         },
     }

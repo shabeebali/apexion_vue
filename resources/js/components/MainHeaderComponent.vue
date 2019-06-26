@@ -27,21 +27,28 @@
         </v-btn>
       </v-toolbar>
       <v-dialog v-model="main_menu_dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-          <v-card>
-              <v-toolbar dark color="primary">
+          <v-card color="teal" :style="{background: menuBackground, backgroundSize:'cover'}">
+              <v-toolbar dark dense color="primary">
                   <v-btn icon dark @click="main_menu_dialog = false">
                       <v-icon>close</v-icon>
                   </v-btn>
-                  <v-toolbar-title>Main Menu</v-toolbar-title>
               </v-toolbar>
-              <v-list v-for="item in main_menu_items" :key="item.index">
-                  <v-list-tile v-bind:to="item.route" @click="main_menu_dialog = false">
-                      <v-list-tile-action>
-                          <v-icon>{{item.name.charAt(0)}}</v-icon>
-                      </v-list-tile-action>
-                      <v-list-tile-title>{{item.name}}</v-list-tile-title>
-                  </v-list-tile>
-              </v-list>
+              <v-layout row wrap px-5 py-5 class="justify-center">
+                <v-flex xs12 sm4 md2 lg1  v-for="item in main_menu_items" :key="item.index">
+                  <v-layout column class="align-center">
+                    <v-flex>
+                      <v-btn color="primary" fab dark :large="$vuetify.breakpoint.mdAndUp" :small="$vuetify.breakpoint.xsOnly" :medium="$vuetify.breakpoint.smAndUp" v-bind:to="item.route" @click="main_menu_dialog = false">
+                        <v-icon>
+                          {{item.icon}}
+                        </v-icon>
+                      </v-btn>
+                    </v-flex>
+                    <v-flex class="white--text font-weight-bold text-uppercase">
+                      {{item.name}}
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
+              </v-layout>
           </v-card>
       </v-dialog>
   </div>
@@ -52,6 +59,7 @@
             return {
               main_menu_dialog: false,
               //main_menu_items : '',
+              menuBackground:'url("'+this.$asset+'/svg/apexion_logo.svg")'
             }
         },
         props:['main_menu_items'],

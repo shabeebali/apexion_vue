@@ -6,16 +6,20 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Modules\Taxonomy\Models\Category;
 use App\Modules\Taxonomy\Models\CategoryType;
+use App\Modules\ProductCode\Models\CodeOrder;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use TorMorten\Eventy\Facades\Events as Eventy;
+use App\Exports\CategoriesExport;
+use App\Imports\CategoriesImport;
 class TaxonomyController extends Controller
 {
     protected $searcheable =['name'];
 
     public function index(Request $request){
+        $user = \Auth::user();
         $headers=[];
         $select_array = ['id','name','type_id','code'];
         $list_terms = helper('apex')->get_list_terms($request,'category',$select_array,$this->searcheable);
@@ -34,6 +38,9 @@ class TaxonomyController extends Controller
                 'fields'=>'',
                 'filterables'=>$list['filterables'],
                 'filtered' => $list['filtered'],
+                'addflag' => $user->can('create_category') ? 1 : 0,
+                'exportflag' => 1,
+                'importflag' => $user->can('create_category') && $user->can('edit_category') ? 1: 0,
             ]
         );
     }
@@ -82,7 +89,7 @@ class TaxonomyController extends Controller
         }
         $obj = new Category;
         $obj->name = trim($request->name);
-        $obj->slug = Str::slug($obj->name);
+        $obj->slug = Str::slug($obj->name,'_');
         $obj->type_id = $request->type_id;
         $obj->code = $request->code;
         $obj->save();
@@ -120,7 +127,7 @@ class TaxonomyController extends Controller
             ]);
         }
         $obj->name = trim($request->name);
-        $obj->slug = Str::slug($obj->name);
+        $obj->slug = Str::slug($obj->name,'_');
         $obj->type_id = $request->type_id;
         $obj->code = $request->code;
         $obj->save();
@@ -149,6 +156,7 @@ class TaxonomyController extends Controller
                     'edit'=>true,
                     'delete'=>true,
                     'id' => $obj->id,
+                    'delete_route' => '/products/category_type/delete',
                 ],
             ];
         }
@@ -181,12 +189,24 @@ class TaxonomyController extends Controller
         }
         $object = new CategoryType;
         $object->name = trim($request->name);
-        $object->slug = Str::slug($object->name);
+        $object->slug = Str::slug($object->name,'_');
         $object->code_length = $request->code_length;
         $object->code_type = $request->code_type;
         $object->autogen = $request->autogen;
         $object->in_pc = $request->in_pc;
         $object->save();
+        $code_order = new CodeOrder;
+        if($request->in_pc){
+            $code_order->type_id = $object->id;
+            $code_order->order = CodeOrder::max('order')+1;
+            $code_order->save();
+        }
+        $cat = new Category;
+        $cat->name = 'None';
+        $cat->slug = Str::slug($cat->name,'_');
+        $cat->type_id = $object->id;
+        $cat->code = str_pad('', $object->code_length,"N");
+        $cat->save();
         return response()->json([
             'message'=>'success',
         ]);
@@ -216,15 +236,117 @@ class TaxonomyController extends Controller
         }
 
         $object->name = trim($request->name);
-        $object->slug = Str::slug($object->name);
+        $object->slug = Str::slug($object->name,'_');
         $object->save();
         return response()->json([
             'message'=>'success',
         ]);
     }
+    public function type_delete(Request $request)
+    {
+        $id = $request->id;
+        $obj = CategoryType::find($id);
+        $in_pc = $obj->in_pc;
+        $categories = $obj->categories()->get();
+        $cat_ids = [];
+        foreach ($categories as $category) {
+            $cat_ids[]=$category->id;
+        }
+        Category::destroy($cat_ids);
+        CategoryType::destroy($id);
+        if($in_pc){
+            CodeOrder::where('type_id',$id)->delete();
+            $code_orders = CodeOrder::orderBy('order','asc')->get();
+            $count = 1;
+            foreach ($code_orders as $code_order) {
+                $code_order->order = $count;
+                $code_order->save();
+                $count++;
+            }
+        }
+    }
     public function get_filterables()
     {
         $filterables = helper('apex')->get_filterables('category',Category::class);
         return response()->json(['filterables'=>$filterables]);
+    }
+    public function code_order()
+    {
+        $code_orders = CodeOrder::orderBy('order','asc')->get();
+        $data=[];
+        foreach ($code_orders as $code_order) {
+            $data[] = [
+                'id' => $code_order->id,
+                'name' => CategoryType::find($code_order->type_id)->name,
+                'order' => $code_order->order,
+            ];
+        }
+        return response()->json([
+            'data'=>$data
+        ]);
+    }
+    public function save_code_order(Request $request)
+    {
+        $ids = explode(",", $request->ids);
+        $count = 1;
+        foreach ($ids as $id) {
+            $code_order = CodeOrder::find($id);
+            $code_order->order = $count;
+            $count++;
+            $code_order->save();
+        }
+    }
+    public function import(Request $request)
+    {
+        $type_id = $request->type_id;
+        $file = $request->file('file');
+        //dd($file->extension());
+        if($file->extension() != 'xlsx')
+        {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Error: The uploaded file is not valid. Please try again'
+            ]);
+        }
+        else{
+            try {
+                $import = new CategoriesImport($type_id);
+                $import->import($request->file('file'));
+            } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+
+                 $failures = $e->failures();
+                
+                 foreach ($failures as $failure) {
+                    $msg = $failure->errors();
+                    $messages[$failure->row()][$failure->attribute()]['message'] = $msg[0];
+                 }
+                 return response()->json([
+                    'status' => 'failed',
+                    'messages' => $messages
+                ]);
+            }
+           return response()->json([
+                'status' => 'success',
+                'message' => 'Import Completed successfully'
+            ]);
+        }
+    }
+    public function export()
+    {
+        return (new CategoriesExport)->download('categories.xlsx');
+    }
+    public function types()
+    {
+        $obj = CategoryType::all();
+        $data=[];
+        foreach ($obj as $type) {
+            $data[] = [
+                'value'=> $type->id,
+                'text' => $type->name,
+            ];
+        }
+        return response()->json([
+            'data'=>$data
+        ]);
     }
 }

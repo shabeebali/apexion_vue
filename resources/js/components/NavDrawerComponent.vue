@@ -20,7 +20,12 @@
                     <v-divider dark v-else-if="item.divider" class="my-0" :key="i"></v-divider>
                     <v-list-tile :key="i" v-else v-bind:to="item.route" @click="extraFunc">
                         <v-list-tile-action :title="item.text">
-                            <v-icon >{{ item.icon }}</v-icon>
+                            <v-badge bottom color="red">
+                                <template v-slot:badge v-if="item.badge">
+                                    <span>{{item.badge}}</span>
+                                </template>
+                                <v-icon >{{ item.icon }}</v-icon>
+                            </v-badge>
                         </v-list-tile-action>
                         <v-list-tile-content>
                             <v-list-tile-title class="grey--text">

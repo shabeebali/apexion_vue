@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-navigation-drawer v-model="listFilterModel" app fixed right clipped>
+        <v-navigation-drawer v-if="Object.keys(filterables).length > 0" v-model="listFilterModel" app fixed right clipped>
             <v-layout row justify-space-between>
                 <v-flex xs6>
                     <v-subheader>Filter By </v-subheader>
@@ -27,172 +27,218 @@
                         <v-subheader class="pl-0 mb-2" style="justify-content:center">{{filterable.name}}</v-subheader>
                         <v-range-slider v-model = "filterables[index].range" :max="filterable.max_value" :min="filterable.min_value" thumb-label="always" ></v-range-slider>
                     </v-flex>
+                    <v-flex xs12 class="px-4" v-if="filterable.type == 'multiselect'">
+                        <v-autocomplete v-model="filterables[index].value" :items="filterable.options" :label="filterable.name "  multiple>
+                            <template v-slot:selection="data">
+                                <v-chip :selected="data.selected" close class="chip--select-multi" @input="remove(data.item)" >
+                                    {{ data.item.text }}
+                                </v-chip>
+                            </template>
+                            <template v-slot:item="data">
+                                <template v-if="data.item.group == ''">
+                                    <v-list-tile-content v-text="data.item.text"></v-list-tile-content>
+                                </template>
+                                <template v-else>
+                                    <v-list-tile-content>
+                                        <v-list-tile-title v-html="data.item.text"></v-list-tile-title>
+                                        <v-list-tile-sub-title v-html="data.item.group"></v-list-tile-sub-title>
+                                    </v-list-tile-content>
+                                </template>
+                            </template>
+                        </v-autocomplete>
+                    </v-flex>
                 </v-list>
             </v-layout>
         </v-navigation-drawer>
-        <v-content :class="listClass">
-            <v-container fluid>
-                <v-layout  row mb-2>
-                    <v-subheader class="headline">{{listHeadline}}</v-subheader>
-                    <v-spacer></v-spacer>
-                    <v-btn class="" flat icon @click.stop="listFilterModel=!listFilterModel"><v-icon>filter_list</v-icon></v-btn>
-                    <v-btn v-if="Object.keys(listFields).length > 0" class="" flat icon @click.stop="listSettingsModel=true"><v-icon>settings</v-icon></v-btn>
-                    <v-btn v-if="addFlag" class="primary" @click="$emit('open-add-dialog')">Add</v-btn>
-                </v-layout>
-                <v-card>
-                    <template v-if="myfiltered">
-                        <v-layout row wrap v-for="ff in myfiltered" :key="ff.key">
-                            <v-flex xs2 v-if="ff.type =='select'">
-                                <v-chip v-on:input="resetItem(ff.key)" close>{{ff.name}}: {{ff.value}}</v-chip>
-                            </v-flex>
-                            <v-flex xs2 v-if="ff.type == 'slider'">
-                                <v-chip v-on:input="resetItem(ff.key)" close>{{ff.range[0]}} < {{ff.name}} > {{ff.range[1]}}</v-chip>
-                            </v-flex>
-                        </v-layout>
-                    </template>
-                    <div class="v-datatable v-table v-datatable--select-all theme--light">
-                        <div class="v-datatable__actions">
-                            <div class="v-datatable__actions__search ml-4 mb-2" style="flex: 1 1 0;">
-                                <v-text-field
-                                v-model="search"
-                                append-icon="search"
-                                label="Search"
-                                single-line
-                                hide-details
-                                ></v-text-field>
-                            </div>
-                            <div class="v-datatable__actions__select">
-                                Rows per page:
-                                <v-select :items="rowsPerPageSelectItems" hide-details v-on:change="rowsPerPageUpdate" v-model="pagination.rowsPerPage">
-                                </v-select>
-                            </div>
-                            <div class="v-datatable__actions__range-controls">
-                                <div class="v-datatable__actions__pagination">
-                                    {{pageControlText}}
-                                </div>
-                                <v-btn flat icon :disabled="pagination.page ==1" v-on:click="pagination.page -= 1">
-                                    <v-icon light>chevron_left</v-icon>
-                                </v-btn>
-                                <v-btn flat icon :disabled="pagination.page == Math.ceil(totalItems/pagination.rowsPerPage)" v-on:click="pagination.page += 1">
-                                    <v-icon light>chevron_right</v-icon>
-                                </v-btn>
-                            </div>
-                        </div>
-                    </div>
-                    <v-data-table
-                    class="apex-list"
-                    :headers="tableHeaders"
-                    :items="tableItems"
-                    item-key="id"
-                    select-all
+        
+        <v-layout  row mb-2>
+            <v-subheader class="headline">{{listHeadline}}</v-subheader>
+            <v-spacer></v-spacer>
 
-                    v-model="selected"
-                    :loading="loading"
-                    :pagination.sync="pagination"
-                    >
-                        <template v-slot:items="props">
-                            <td>
-                                <v-checkbox
-                                v-model="props.selected"
-                                primary
-                                hide-details
-                                ></v-checkbox>
-                            </td>
-                            <template v-for="(it,key) in props.item" v-if="key != 'id'">
-                                <td v-if="it.actions" class="justify-end layout">
-                                    <v-tooltip bottom v-if="it.edit">
+            <v-tooltip bottom v-if="exportable && exportFlag">
+                <template v-slot:activator="{ on }">
+                    <v-btn flat icon v-on="on" @click.stop="exportFn">
+                        <v-icon>publish</v-icon>
+                    </v-btn>
+                </template>
+                <span>Export</span>
+            </v-tooltip>
+            <v-tooltip bottom v-if="importable && importFlag">
+                <template v-slot:activator="{ on }">
+                    <v-btn flat icon v-on="on" to="import">
+                        <v-icon>get_app</v-icon>
+                    </v-btn>
+                </template>
+                <span>Import</span>
+            </v-tooltip>
+            <v-btn flat icon v-if="Object.keys(filterables).length > 0" @click.stop="listFilterModel=!listFilterModel"><v-icon>filter_list</v-icon></v-btn>
+            <v-btn v-if="Object.keys(listFields).length > 0" class="" flat icon @click.stop="listSettingsModel=true"><v-icon>settings</v-icon></v-btn>
+            <v-btn v-if="addFlag" class="primary" @click="$emit('open-add-dialog')">Add</v-btn>
+        </v-layout>
+        <v-card>
+            <template v-if="myfiltered">
+                <v-layout row wrap>
+                    <template v-for="ff in myfiltered">
+                        <v-flex lg2 md3 sm4 xs6 v-if="ff.type =='select'">
+                            <v-chip v-on:input="resetItem(ff.key)" close>{{ff.name}}: {{ff.value}}</v-chip>
+                        </v-flex>
+                        <template v-if="ff.type =='multiselect'">
+                            <v-flex lg2 md3 sm4 xs6 v-for="(t,index) in ff.terms" :key="index">
+                                <v-chip v-on:input="resetItem(ff.key,t.id)" close>{{t.name}}</v-chip>
+                            </v-flex>
+                        </template>
+                        <v-flex lg2 md3 sm4 xs6 v-if="ff.type == 'slider'">
+                            <v-chip v-on:input="resetItem(ff.key)" close>{{ff.range[0]}} < {{ff.name}} > {{ff.range[1]}}</v-chip>
+                        </v-flex>
+                    </template>
+                </v-layout>
+            </template>
+            <div class="v-datatable v-table v-datatable--select-all theme--light">
+                <div class="v-datatable__actions">
+                    <div class="v-datatable__actions__search ml-4 mb-2" style="flex: 1 1 0;">
+                        <v-text-field
+                        v-model="search"
+                        append-icon="search"
+                        label="Search"
+                        single-line
+                        hide-details
+                        ></v-text-field>
+                    </div>
+                    <div class="v-datatable__actions__select">
+                        Rows per page:
+                        <v-select :items="rowsPerPageSelectItems" hide-details v-on:change="rowsPerPageUpdate" v-model="pagination.rowsPerPage">
+                        </v-select>
+                    </div>
+                    <div class="v-datatable__actions__range-controls">
+                        <div class="v-datatable__actions__pagination">
+                            {{pageControlText}}
+                        </div>
+                        <v-btn flat icon :disabled="pagination.page ==1" v-on:click="pagination.page -= 1">
+                            <v-icon light>chevron_left</v-icon>
+                        </v-btn>
+                        <v-btn flat icon :disabled="pagination.page == Math.ceil(totalItems/pagination.rowsPerPage)" v-on:click="pagination.page += 1">
+                            <v-icon light>chevron_right</v-icon>
+                        </v-btn>
+                    </div>
+                </div>
+            </div>
+            <v-data-table
+            class="apex-list"
+            :headers="tableHeaders"
+            :items="tableItems"
+            item-key="id"
+            select-all
+
+            v-model="selected"
+            :loading="loading"
+            :pagination.sync="pagination"
+            >
+                <template v-slot:items="props">
+                    <td>
+                        <v-checkbox
+                        v-model="props.selected"
+                        primary
+                        hide-details
+                        ></v-checkbox>
+                    </td>
+                    <template v-for="(it,key) in props.item" v-if="key != 'id'">
+                        <td v-if="it.actions" class="justify-end layout">
+                            <v-tooltip bottom v-if="it.edit">
+                                <template v-slot:activator="{ on }">
+                                    <v-btn icon v-on="on" @click="editItem(props.item)">
+                                        <v-icon  small>edit</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Edit</span>
+                            </v-tooltip>
+                            <v-tooltip bottom v-if="it.delete">
+                                <template v-slot:activator="{ on }">
+                                    <v-btn icon v-on="on" @click="deleteItem(it)">
+                                        <v-icon  small>delete</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Delete</span>
+                            </v-tooltip>
+                        </td>
+                        <td v-else-if="key == 'name'">
+                            <v-layout row wrap align-content-space-between>
+                                <v-flex align-self-center>
+                                    <router-link :to="'view/'+props.item.id">{{it}}</router-link>
+                                </v-flex>
+                                <v-flex align-self-center class="text-xs-right">
+                                    <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
-                                            <v-btn icon v-on="on" @click="editItem(props.item)">
-                                                <v-icon  small>edit</v-icon>
+                                            <v-btn icon v-on="on" @click="textCopy(props.item.name)">
+                                                <v-icon  light>file_copy</v-icon>
                                             </v-btn>
                                         </template>
-                                        <span>Edit</span>
+                                        <span>Copy</span>
                                     </v-tooltip>
-                                    <v-tooltip bottom v-if="it.delete">
-                                        <template v-slot:activator="{ on }">
-                                            <v-btn icon v-on="on" @click="deleteIds.push(props.item.id); deleteDialog = true;">
-                                                <v-icon  small>delete</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <span>Delete</span>
-                                    </v-tooltip>
-                                </td>
-                                <td v-else>{{it}}</td>
-                            </template>
-                        </template>
-                        <template v-slot:no-results>
-                            <v-alert :value="true" color="error" icon="warning">
-                                Your search for "{{ search }}" found no results.
-                            </v-alert>
-                        </template>
-                        <template v-slot:no-data>
-                            <v-alert :value="true" color="info" icon="warning">
-                                No data available. Please Add.
-                            </v-alert>
-                        </template>
-                        <template v-slot:footer>
-                            <v-layout class="justify-start">
-                                <v-btn @click="deleteMany" color="error" :disabled="selected.length == 0">Delete</v-btn>
+                                </v-flex>
                             </v-layout>
-                        </template>
-                    </v-data-table>
-                    <v-dialog v-model="listSettingsModel" persistent max-width="600px" v-if="listFields">
-                        <v-card>
-                            <v-card-title>
-                                <span class="headline">Fields to include in table</span>
-                            </v-card-title>
-                            <v-card-text>
-                                <v-container grid-list-md>
-                                    <v-layout wrap >
-                                        <template v-for="(ff,key) in listFields" v-if="key != 'id'">
-                                            <v-flex xs12>
-                                                <v-switch v-model="ff.selected" :label="ff.text"></v-switch>
-                                            </v-flex>
-                                        </template>
-                                    </v-layout>
-                                </v-container>
-                            </v-card-text>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="blue darken-1" flat @click="listSettingsModel = false">Close</v-btn>
-                                <v-btn color="blue darken-1" flat @click="saveListSettings">Save</v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-dialog>
-                    <v-dialog v-model="deleteDialog" persistent max-width="300px">
-                        <v-card>
-                            <v-card-title>
-                                <span class="headline">Are you sure want to delete this item ?</span>
-                            </v-card-title>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="green darken-1" flat @click="deleteDialog = false">No</v-btn>
-                                <v-btn color="red darken-1" flat @click="deleteItem">Yes</v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-dialog>
-                    <v-dialog v-model="loadingDialog"
-                      hide-overlay
-                      persistent
-                      width="300"
-                    >
-                      <v-card
-                        color="teal"
-                        dark
-                      >
-                        <v-card-text>
-                          Please stand by
-                          <v-progress-linear
-                            indeterminate
-                            color="white"
-                            class="mb-0"
-                          ></v-progress-linear>
-                        </v-card-text>
-                      </v-card>
-                    </v-dialog>
+                        </td>
+                        <td v-else>{{it}}</td>
+                    </template>
+                </template>
+                <template v-slot:no-results>
+                    <v-alert :value="true" color="error" icon="warning">
+                        Your search for "{{ search }}" found no results.
+                    </v-alert>
+                </template>
+                <template v-slot:no-data>
+                    <v-alert :value="true" color="info" icon="warning">
+                        No data available. Please Add.
+                    </v-alert>
+                </template>
+                <template v-slot:footer v-if="deleteManyFlag">
+                    <v-layout class="justify-start">
+                        <v-btn @click="deleteMany" color="error" :disabled="selected.length == 0">Delete</v-btn>
+                    </v-layout>
+                </template>
+            </v-data-table>
+            <v-dialog v-model="listSettingsModel" persistent max-width="600px" v-if="listFields">
+                <v-card>
+                    <v-card-title>
+                        <span class="headline">Fields to include in table</span>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-container grid-list-md>
+                            <v-layout wrap >
+                                <template v-for="(ff,key) in listFields" v-if="key != 'id'">
+                                    <v-flex xs12>
+                                        <v-switch v-model="ff.selected" :label="ff.text"></v-switch>
+                                    </v-flex>
+                                </template>
+                            </v-layout>
+                        </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1" flat @click="listSettingsModel = false">Close</v-btn>
+                        <v-btn color="blue darken-1" flat @click="saveListSettings">Save</v-btn>
+                    </v-card-actions>
                 </v-card>
-            </v-container>
-        </v-content>
+            </v-dialog>
+            <v-dialog v-model="loadingDialog"
+              hide-overlay
+              persistent
+              width="300"
+            >
+              <v-card
+                color="teal"
+                dark
+              >
+                <v-card-text>
+                  Please stand by
+                  <v-progress-linear
+                    indeterminate
+                    color="white"
+                    class="mb-0"
+                  ></v-progress-linear>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
+        </v-card>
     </div>
 </template>
 <style>
@@ -213,6 +259,7 @@ export default{
     data(){
         return{
             deleteDialog:false,
+            addFlag:false,
             listRoute:'',
             listFilterModel:false,
             listSettingsModel:false,
@@ -226,7 +273,10 @@ export default{
             listFields:[],
             myfiltered:[],
             deleteIds:[],
+            deleteManyFlag:false,
             loadingDialog:false,
+            exportFlag:false,
+            importFlag:false,
             rowsPerPageSelectItems:[
                 {
                     'text':'5',
@@ -248,7 +298,37 @@ export default{
             pageControlText:'',
         }
     },
-    props:['baseRoute','listSettingsRoute','filterables','triggerUpdate','addFlag','listHeadline','listClass'],
+    props:{
+        'baseRoute':{
+            type: String
+        },
+        'listSettingsRoute':{
+            type: String
+        },
+        'filterables': '',
+        'triggerUpdate':{
+            type: Boolean
+        },
+        'listHeadline':{
+            type: String
+        },
+        'listClass':{
+            type: String
+        },
+        'exportable':{
+            type:Boolean,
+            default:false
+        },
+        'importable':{
+            type:Boolean,
+            default:false
+        }
+    },
+    computed:{
+        exportRoute: function(){
+            return window.axios.defaults.baseURL+this.baseRoute.substr(0,this.baseRoute.indexOf('?'))+'/export'
+        }
+    },
     watch: {
         pagination: {
             handler () {
@@ -297,6 +377,23 @@ export default{
         this.updateList()
     },
     methods:{
+        exportFn(){
+            this.loadingDialog = true
+            axios({
+                url: this.exportRoute,
+                method: 'GET',
+                responseType: 'blob', // important
+            }).then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', this.listHeadline+'.xlsx'); //or any other extension
+                document.body.appendChild(link);
+                this.loadingDialog = false
+
+               link.click();
+            });
+        },
         resetFilter(){
             Object.keys(this.filterables).forEach((key)=>{
 
@@ -323,6 +420,11 @@ export default{
                         str = str+"&"+key+"="+this.filterables[key].range[0]+","+this.filterables[key].range[1]
                     }
                 }
+                if(this.filterables[key].type == 'multiselect'){
+                    if(this.filterables[key].value !== undefined || this.filterables[key].value != ''){
+                        str = str+"&"+key+"="+this.filterables[key].value.toString()
+                    }
+                }
             });
             this.listRoute = this.baseRoute+str
         },
@@ -334,13 +436,13 @@ export default{
                 this.tableHeaders = data.headers
                 this.listFields = data.fields
                 this.myfiltered = data.myfiltered
-                console.log(this.tableHeaders)
-                console.log(this.tableItems)
+                this.addFlag = data.addFlag
+                this.exportFlag = data.exportFlag
+                this.importFlag = data.importFlag
+                this.deleteManyFlag = data.items[0].actions.delete
             })
-
-
         },
-        resetItem($event){
+        resetItem($event, id = null){
             Object.keys(this.filterables).forEach((key)=>{
                 if(key == $event){
                     if(this.filterables[key].type == 'select'){
@@ -348,6 +450,11 @@ export default{
                     }
                     if(this.filterables[key].type == 'slider'){
                         this.filterables[key].range = this.filterables[key].default
+                    }
+                    if(this.filterables[key].type == 'multiselect'){
+                        var list = this.filterables[key].value
+                        list.splice(list.indexOf(id), 1)
+                        this.filterables[key].value = list
                     }
                 }
             });
@@ -381,32 +488,50 @@ export default{
         editItem(item){
             this.$emit('open-edit-dialog',item.id)
         },
-        deleteItem(){
-            this.deleteDialog=false
-            this.loadingDialog=true
-            var fD = new FormData()
-            var delete_ids = new Array()
-            this.deleteIds.forEach((id)=>{
-                delete_ids.push(id)
-            })
-            fD.append('delete_ids',delete_ids)
-            axios.post(this.baseRoute.substr(0,(this.baseRoute.length -1))+'/delete',fD).then((response)=>{
-                if(response.status == 200 && response.data.message == 'success'){
-                    this.loadingDialog = false
-                    this.updateList()
-                    this.deleteId = new Array()
+        deleteItem(item){
+            this.confirmDialog('Do you really want to delete this item?').then(res => {
+                if(res == true){
+                    this.loadingDialog=true
+                    var fD = new FormData()
+                    fD.append('delete_ids',item.id)
+                    axios.post(this.baseRoute.substr(0,this.baseRoute.indexOf('?'))+'/delete',fD).then((response)=>{
+                        if(response.status == 200 && response.data.message == 'success'){
+                            this.loadingDialog = false
+                            this.updateList()
+                            this.deleteId = new Array()
+                        }
+                        else{
+                            alert('Something went wrong!')
+                        }
+                    })
                 }
                 else{
-                    alert('Something went wrong!')
+                    
                 }
             })
         },
         deleteMany(){
-            this.deleteIds = new Array()
-            this.selected.forEach((item)=>{
-                this.deleteIds.push(item.id)
+            this.confirmDialog('Do you really want to delete these items?').then(res => {
+                if(res == true){
+                    this.loadingDialog=true
+                    this.deleteIds = new Array()
+                    this.selected.forEach((item)=>{
+                        this.deleteIds.push(item.id)
+                    })
+                    var fD = new FormData()
+                    fD.append('delete_ids',this.deleteIds)
+                    axios.post(this.baseRoute.substr(0,this.baseRoute.indexOf('?'))+'/delete',fD).then((response)=>{
+                        if(response.status == 200 && response.data.message == 'success'){
+                            this.loadingDialog = false
+                            this.updateList()
+                            this.deleteId = new Array()
+                        }
+                        else{
+                            alert('Something went wrong!')
+                        }
+                    })
+                }
             })
-            this.deleteItem()
         },
         getDataFromApi(search){
             this.loading = true;
@@ -417,6 +542,9 @@ export default{
                 let headers = data.headers;
                 let fields = data.fields;
                 let myfiltered = data.myfiltered;
+                let addFlag = data.addFlag;
+                let exportFlag = data.exportFlag
+                let importFlag = data.importFlag
                 /*
                 if (this.pagination.sortBy) {
                     items = items.sort((a, b) => {
@@ -452,7 +580,10 @@ export default{
                     'headers':headers,
                     'total':total,
                     'fields':fields,
-                    'myfiltered':myfiltered
+                    'myfiltered':myfiltered,
+                    'addFlag':addFlag,
+                    'exportFlag':exportFlag,
+                    'importFlag':importFlag,
                 }
                 this.loading=false
                 return data2
@@ -479,17 +610,29 @@ export default{
                     data.total = response.data.total;
                     data.fields = response.data.fields;
                     data.myfiltered = response.data.filtered;
+                    data.addFlag = response.data.addflag;
+                    data.exportFlag = response.data.exportflag;
+                    data.importFlag = response.data.importflag;
                     return data;
                 }
                 else{
                     console.log(response.status)
                 }
-            }).catch((error)=>{
-                console.log(error);
-            });
+            })
         },
         rowsPerPageUpdate(){
             this.pagination.page=1
+        },
+        textCopy(text){
+            const el = document.createElement('textarea');
+            el.value = text;
+            el.setAttribute('readonly', '');
+            el.style.position = 'absolute';
+            el.style.left = '-9999px';
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
         }
     },
 }

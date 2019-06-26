@@ -29,7 +29,15 @@ window.axios.defaults.baseURL = 'http://localhost/apexion/public/api';
  * all outgoing HTTP requests automatically have it attached. This is just
  * a simple convenience so we don't have to attach every token manually.
  */
-
+window.axios.interceptors.response.use((response)=> {
+    return response;
+},(error)=> {
+    if (401 === error.response.status) {
+        window.location.replace(window.axios.defaults.baseURL.substr(0,window.axios.defaults.baseURL.length-3)+'login')
+    } else {
+        return Promise.reject(error);
+    }
+});
 let token = document.head.querySelector('meta[name="csrf-token"]');
 
 if (token) {
@@ -44,13 +52,14 @@ if (token) {
  * allows your team to easily build robust real-time web applications.
  */
 
-// import Echo from 'laravel-echo'
+ import Echo from 'laravel-echo'
 
-// window.Pusher = require('pusher-js');
+ window.Pusher = require('pusher-js');
 
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: process.env.MIX_PUSHER_APP_KEY,
-//     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-//     encrypted: true
-// });
+ window.Echo = new Echo({
+     broadcaster: 'pusher',
+     key: '5d4efb0d3073bcdece3a',
+     cluster: 'ap2',
+     encrypted: true,
+     authEndpoint: '/apexion/public/broadcasting/auth',
+ });

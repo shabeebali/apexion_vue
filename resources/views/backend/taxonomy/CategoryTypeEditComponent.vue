@@ -57,14 +57,6 @@ export default{
     mounted(){
 
     },
-    watch:{
-        formdata:{
-            handler(){
-                console.log(this.formdata)
-            },
-            deep: true
-        }
-    },
     data(){
         return{
             success:false,

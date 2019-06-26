@@ -32,6 +32,14 @@ class PermissionSeeder extends Seeder
                 'name'=>'delete_product',
                 'guard_name' => 'api',
             ],
+            [
+                'name'=>'approve_product',
+                'guard_name' => 'api',
+            ],
+            [
+                'name'=>'sync_tally',
+                'guard_name' => 'api',
+            ],
         ]);
     }
 }

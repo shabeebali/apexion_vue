@@ -43,5 +43,22 @@ class LoginController extends Controller
 
         //return view('backend.app',['token'=>$token]);
     }
+    public function logout(Request $request)
+    {
+        $user = \Auth::user();
+        $token = Str::random(60);
+        $user->api_token = hash('sha256', $token);
+        $user->save();
+        $this->guard()->logout();
 
+        $request->session()->invalidate();
+
+        return $this->loggedOut($request) ?: redirect('/login');
+        //return redirect('/login');
+    }
+    public function loggedOut(Request $request)
+    {
+
+        return redirect('/login');
+    }
 }

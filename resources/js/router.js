@@ -1,5 +1,12 @@
 import SettingsIndex from '../views/backend/settings/IndexComponent.vue'
-import SettingsUsers from '../views/backend/settings/UsersComponent.vue'
+import SettingsUsersList from '../views/backend/settings/UsersListComponent.vue'
+import SettingsUsersIndex from '../views/backend/settings/UsersIndexComponent.vue'
+import SettingsUsersAdd from '../views/backend/settings/UsersAddComponent.vue'
+import SettingsUsersEdit from '../views/backend/settings/UsersEditComponent.vue'
+import SettingsUsersRolesList from '../views/backend/settings/UserRolesListComponent.vue'
+import SettingsUserRoleIndex from '../views/backend/settings/UserRoleIndexComponent.vue'
+import SettingsUserRoleAdd from '../views/backend/settings/UserRoleAddComponent.vue'
+import SettingsUserRoleEdit from '../views/backend/settings/UserRoleEditComponent.vue'
 
 import SettingsAcl from '../views/backend/settings/acl/IndexComponent.vue'
 import SettingsAclPermissions from '../views/backend/settings/acl/PermissionsComponent.vue'
@@ -8,11 +15,23 @@ import DashboardIndex from '../views/backend/dashboard/IndexComponent.vue'
 
 import ProductsIndex from '../views/backend/product/ProductsIndexComponent.vue'
 import ProductsList from '../views/backend/product/ProductsListComponent.vue'
+import ProductsPendingList from '../views/backend/product/ProductsPendingListComponent.vue'
+import ProductsTallyList from '../views/backend/product/ProductsTallyListComponent.vue'
 import ProductsAdd from '../views/backend/product/ProductsAddComponent.vue'
+import ProductsEdit from '../views/backend/product/ProductsEditComponent.vue'
+import ProductsImport from '../views/backend/product/ProductsImportComponent.vue'
 import ProductsSettings from '../views/backend/product/ProductsSettingsComponent.vue'
+import ProductsCategoriesIndex from '../views/backend/taxonomy/CategoriesIndexComponent.vue'
 import ProductsCategoriesList from '../views/backend/taxonomy/CategoriesListComponent.vue'
 import ProductsCategoriesAdd from '../views/backend/taxonomy/CategoriesAddComponent.vue'
+import ProductsCategoriesImport from '../views/backend/taxonomy/CategoriesImportComponent.vue'
+
+import CustomerIndex from '../views/backend/customer/CustomerIndexComponent.vue'
+import CustomerList from '../views/backend/customer/CustomerListComponent.vue'
+import CustomerAdd from '../views/backend/customer/CustomerAddComponent.vue'
+import CustomerEdit from '../views/backend/customer/CustomerEditComponent.vue'
 export const routes=[
+
     {
         path:'/',
         name:'Dashboard',
@@ -24,27 +43,43 @@ export const routes=[
         component:SettingsIndex,
         children:[
             {
-                path:'acl',
-                name:'ACL',
-                component:SettingsAcl,
+                path:'users',
+                name:'Users',
+                component:SettingsUsersIndex,
                 children:[
                     {
-                        path:'permissions',
-                        name:'Permissions',
-                        component:SettingsAclPermissions,
+                        'path':'list',
+                        component:SettingsUsersList,
+                    },
+                    {
+                        path:'add',
+                        component:SettingsUsersAdd,
+                    },
+                    {
+                        path:'edit/:id',
+                        component:SettingsUsersEdit,
                     },
                     {
                         path:'roles',
-                        name:'Roles',
-                        component:SettingsAclRoles,
-                    }
+                        component:SettingsUserRoleIndex,
+                        children:[
+                            {
+                                path:'list',
+                                component:SettingsUsersRolesList,
+                            },
+                            {
+                                path:'add',
+                                component:SettingsUserRoleAdd,
+                            },
+                            {
+                                path:'edit/:id',
+                                component:SettingsUserRoleEdit,
+                            }
+                        ]
+                    }, 
                 ]
             },
-            {
-                path:'users',
-                name:'Users',
-                component:SettingsUsers,
-            }
+            
         ]
     },
     {
@@ -54,29 +89,64 @@ export const routes=[
         children:[
             {
                 path:'list',
-                name:'Products List',
                 component:ProductsList,
             },
             {
+                path:'pending',
+                component:ProductsPendingList,
+            },
+            {
+                path:'tally',
+                component:ProductsTallyList,
+            },
+            {
                 path:'add',
-                name:'Products Add',
                 component:ProductsAdd,
             },
             {
+                path:'edit/:id',
+                component:ProductsEdit,
+            },
+            {
+                path:'import',
+                component:ProductsImport,
+            },
+            {
                 path:'settings',
-                name:'Products Settings',
                 component:ProductsSettings,
             },
             {
                 path:'categories',
-                name:'Products Categories',
-                component:ProductsCategoriesList,
-            },
-            {
-                path:'categories/add',
-                name:'Product Category Add',
-                component:ProductsCategoriesAdd,
+                component:ProductsCategoriesIndex,
+                children:[
+                    {
+                        path:'list',
+                        component:ProductsCategoriesList,
+                    },
+                    {
+                        path:'import',
+                        component:ProductsCategoriesImport,
+                    },
+                ]
             },
         ]
+    },
+    {
+        path:'/customers',
+        component:CustomerIndex,
+        children:[
+            {
+                path:'list',
+                component:CustomerList,
+            },
+            {
+                path:'add',
+                component:CustomerAdd,
+            },
+            {
+                path:'edit/:id',
+                component:CustomerEdit,
+            },
+        ],
     },
 ];

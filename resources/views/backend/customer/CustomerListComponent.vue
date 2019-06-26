@@ -1,0 +1,66 @@
+<template>
+    <div>
+        <v-content>
+            <div>
+                <v-breadcrumbs :items="breadcrumbs" divider=">"></v-breadcrumbs>
+            </div>
+            <v-container fluid class="pt-0">
+                <list-component
+                listHeadline="Customers"
+                listClass="customers-list"
+                :baseRoute="baseRoute"
+                :filterables="filterables"
+                :listSettingsRoute="listSettingsRoute"
+                :triggerUpdate="triggerUpdate"
+                v-on:triggered-update="triggerUpdate=false"
+                v-on:open-add-dialog="redirectAdd"
+                v-on:open-edit-dialog="editItem"
+                exportable
+                importable></list-component>
+            </v-container>
+        </v-content>
+    </div>
+</template>
+<script>
+    import ListComponent from '../../../js/components/ListComponent.vue'
+    export default{
+        components:{
+            'list-component':ListComponent,
+        },
+        data(){
+            return{
+                baseRoute:'/customers?',
+                listSettingsRoute:'',
+                filterables:[],
+                addDialog:false,
+                triggerUpdate:false,
+                editDialog:false,
+                editId:0,
+                pending_count:0,
+                tally_count:0,
+                breadcrumbs:[
+                    {
+                        text:'Home',
+                        disabled:false,
+                        to:'/'
+                    },
+                    {
+                        text:'Customers',
+                        disabled:true,
+                        to:'/customers/list'
+                    },
+                ]
+            }
+        },
+        mounted(){
+        },
+        methods:{
+            editItem($event){
+                this.$router.push('edit/'+$event)
+            },
+            redirectAdd(){
+                this.$router.push('add')
+            }
+        }
+    }
+</script>

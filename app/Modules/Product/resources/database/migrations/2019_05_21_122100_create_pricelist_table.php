@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateProductsTable extends Migration
+class CreatePricelistTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,11 @@ class UpdateProductsTable extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
+        Schema::create('pricelist', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name')->unique();
             $table->string('slug')->unique();
+            $table->timestamps();
         });
     }
 
@@ -25,7 +28,7 @@ class UpdateProductsTable extends Migration
      */
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
+        Schema::table('pricelist', function (Blueprint $table) {
             //
         });
     }

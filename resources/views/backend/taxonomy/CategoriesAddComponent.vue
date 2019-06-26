@@ -105,7 +105,6 @@ export default{
                         Object.keys(response.data.errors).forEach((key)=>{
                             this.formdata[key]['error'] = response.data.errors[key]
                         })
-                        console.log(this.formdata)
                     }
                 }
                 else{

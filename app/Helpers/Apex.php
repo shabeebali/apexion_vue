@@ -1,5 +1,6 @@
 <?php
 namespace App\Helpers;
+use Validator;
 use Konekt\Concord\Facades\Concord;
 class Apex
 {
@@ -76,31 +77,48 @@ class Apex
                             'type' => $filter['type']
                         ];
                     }
-
                 }
                 if($filter['relation'] == 'one2many' || $filter['relation'] == 'many2many')
                 {
                     if($filter['type']=='multiselect')
                     {
                         $terms = explode(",",$request->get($key));
+                        //dd($terms);
                         $data = $data->filter(function($item) use($request,$key,$filter,$terms){
-                            $its = $item->$key()->get();
-                            $count=0;
+                            if(isset($filter['relation_func'])){
+                                $func_name = $filter['relation_func'];
+                               $its = $item->$func_name(); 
+                            }
+                            else{
+                                $its = $item->$key()->get();
+                            }
+                            //dd($its);
+                            $count=0;       
                             foreach ($its as $it) {
                                 if(in_array($it[$filter['filter_column']],$terms))
                                 {
                                     $count = $count+1;
                                 }
+                                
                             }
                             if($count == count($terms)){
                                 return true;
                             }
                             return false;
                         });
+                        $term_names=[];
+                        foreach ($terms as $id) {
+                            $it = $filter['class']::find($id);
+                            $temp = [
+                                'name'=>$it->name,
+                                'id'=>$it->id
+                            ];
+                            $term_names[] = $temp;
+                        }
                         $filtered[]=
                         [
                             'key' => $key,
-                            'terms' => $terms,
+                            'terms' => $term_names,
                             'name' => $filter['name'],
                             'type' => $filter['type']
                         ];
@@ -149,6 +167,31 @@ class Apex
                     }
                     $filterable[$key]['options'] = $temp;
                     $filterable[$key]['value'] = '-1';
+                }
+            }
+            if($arr['relation'] == 'many2many' || $arr['relation'] == 'one2many')
+            {
+
+                if($arr['type'] == 'multiselect')
+                {
+                    $rel_class = $arr['class'];
+                    $items = $rel_class::all();
+                    $temp=[];
+                    foreach ($items as $item) {
+                        $group = '';
+                        if(isset($arr['group_class']))
+                        {
+                            $func_name = $arr['group_relation'];
+                            $group = $item->$func_name()->first()->name;
+                        }
+                        $temp[] = [
+                            'text' => $item->name,
+                            'value' => $item->id,
+                            'group' =>  $group,
+                        ];
+                    }
+                    $filterable[$key]['options'] = $temp;
+                    $filterable[$key]['value'] = '';
                 }
             }
         }
@@ -225,7 +268,7 @@ class Apex
                     if(array_key_exists($select_term,$filterables) && $filterables[$select_term]['relation'] != 'none')
                     {
                         $func_name = substr($select_term,0,strlen($select_term)-3);
-                        $new_arr[$func_name] = $dat->$func_name()->first()->name;
+                        $new_arr[$select_term] = $dat->$func_name()->first()->name;
                     }
                     else
                     {
@@ -236,11 +279,20 @@ class Apex
             }
         );
         $items = [];
+        $user = \Auth::user();
+        $delete_flag = 0;
+        if($user->can('delete_'.$entity)){
+            $delete_flag = 1;
+        }
+        $edit_flag = 0;
+        if($user->can('edit_'.$entity)){
+            $edit_flag = 1;
+        }
         foreach ($data as $dat) {
             $dat['actions'] = [
-                'actions'=>true,
-                'edit'=>true,
-                'delete'=>true,
+                'actions'=>1,
+                'edit'=>$edit_flag,
+                'delete'=>$delete_flag,
                 'id' => $dat['id'],
             ];
             $items[] = $dat;
@@ -251,5 +303,29 @@ class Apex
             'filterables'=> $filterables,
             'filtered' => $filtered,
         ];
+    }
+    public function make_unique_code($pc,$id=NULL){
+        $count = 0;
+        $pc = $pc.str_pad($count, 3,0,STR_PAD_LEFT);
+        if(!$id){
+
+            $data['sku'] = $pc;
+            while(Validator::make($data,['sku'=>'unique:products,sku'])->fails()){
+                $pc = substr($pc, 0, -3);
+                $count = $count + 1;
+                $pc = $pc.str_pad($count, 3,0,STR_PAD_LEFT);
+                $data['sku'] = $pc;
+            }
+        }
+        else{
+            $data['sku'] = $pc;
+            while(Validator::make($data,['sku'=>'unique:products,sku,'.$id])->fails()){
+                $pc = substr($pc, 0, -3);
+                $count = $count + 1;
+                $pc = $pc.str_pad($count, 3,0,STR_PAD_LEFT);
+                $data['sku'] = $pc;
+            }
+        }
+        return $pc;
     }
 }

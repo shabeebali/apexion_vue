@@ -14,26 +14,7 @@ export default{
         return{
             page_title:'Products',
             sidebar:false,
-            items:[
-                {
-                    'text':'Products',
-                    'route':'/products/list',
-                    'icon':'list_alt',
-                },
-                {
-                    'text':'Categories',
-                    'route':'/products/categories',
-                    'icon':'category',
-                },
-                {
-                    'text':'Settings',
-                    'route':'/products/settings',
-                    'icon':'settings',
-                },
-                {
-                    'divider': true,
-                },
-            ]
+            items:''
         }
     },
     components:{
@@ -45,6 +26,11 @@ export default{
                 this.sidebar = !this.sidebar
             }
         }
+    },
+    mounted(){
+        axios.get('products/get_menu').then((response)=>{
+            this.items = response.data.items
+        })
     },
     methods:{
         toggleSidebar(){

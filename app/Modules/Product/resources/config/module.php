@@ -2,7 +2,9 @@
 return [
     'menu' => [
         'route' => '/products/list',
-        'name' => 'Products'
+        'name' => 'Products',
+        'icon' => 'list_alt',
+        'permission' => 'list_products'
     ],
     'permissions'=>[
         'create_product',
@@ -37,11 +39,6 @@ return [
                 ],
                 'value'=>'-1',
             ],
-            'stock'=>[
-                'name'=>'Stock',
-                'type'=>'slider',
-                'relation'=>'none',
-            ],
             'weight'=>[
                 'name'=>'Weight',
                 'type'=>'slider',
@@ -57,7 +54,10 @@ return [
                 'type'=>'multiselect',
                 'relation'=>'one2many',
                 'relation_name'=>'category',
-                'filter_column'=>'name',
+                'filter_column'=>'id',
+                'class'=>'App\Modules\Taxonomy\Models\Category',
+                'group_class'=>'App\Modules\Taxonomy\Models\CategoryType',
+                'group_relation' => 'type'
             ]
         ],
     ],
@@ -93,9 +93,12 @@ return [
             'weight'=>[
                 'text'=>'Weight'
             ],
-            'stock'=>[
-                'text'=>'Stock'
+            'remarks'=>[
+                'text' => 'Remarks'
             ],
+            'description'=>[
+                'text' => 'Description'
+            ]
         ]
     ]
 ];

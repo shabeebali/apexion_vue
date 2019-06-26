@@ -3,7 +3,7 @@ return [
     'filterable'=>[
         'category'=>[
             'type_id'=>[
-                'name'=>'Category Type',
+                'name'=>'CategoryType',
                 'type'=>'select',
                 'relation'=>'many2one',
                 'class' => 'App\Modules\Taxonomy\Models\CategoryType',
@@ -20,7 +20,7 @@ return [
                 'text'=>'Name'
             ],
             'type_id'=>[
-                'text'=>'Category Type'
+                'text'=>'CategoryType'
             ],
             'code'=>[
                 'text' => 'Code'

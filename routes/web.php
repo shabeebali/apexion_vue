@@ -24,6 +24,9 @@ Route::middleware('auth')->group(function(){
         Route::get('/{any}',function(){
             return view('backend.app');
         })->where('any', '.*');
+        Route::get('/',function(){
+            return view('backend.app');
+        });
     });
     Route::get('/generate_token','Auth\ApexionController@generate_token');
 });

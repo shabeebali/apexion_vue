@@ -5,17 +5,31 @@ import Vuetify from 'vuetify'
 import VueRouter from 'vue-router'
 import colors from 'vuetify/es5/util/colors'
 import {routes} from './router.js'
-
 import AppComponent from './components/AppComponent.vue'
+
+
 Vue.use(Vuetify)
 Vue.use(VueRouter)
-console.log(routes)
 const router = new VueRouter({
   routes,
   base:'/apexion/public/admin',
   mode:'history',
 });
 Vue.prototype.$asset = '/apexion/public'
+Vue.mixin({
+  methods: {
+    confirmDialog(msg) {
+      return new Promise(function (resolve, reject) {
+      let confirmed = window.confirm(msg);
+
+      return confirmed ? resolve(true) : reject(false);
+      });
+    }
+  },
+  forceLogout(){
+    window.location.replace(window.axios.defaults.baseURL.substr(0,window.axios.defaults.baseURL.length-3)+'login')
+  }
+})
 //Vue.component('app', require('./components/AppComponent.vue'));
 const app = new Vue({
     router:router,
@@ -25,5 +39,8 @@ const app = new Vue({
     },
     created(){
         this.$vuetify.theme.primary = colors.teal.darken1
+    },
+    methods:{
+      
     }
 });
