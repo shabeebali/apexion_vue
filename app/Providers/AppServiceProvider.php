@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->concord->registerHelper('apex', \App\Helpers\Apex::class);
+        Schema::defaultStringLength(191);
 
     }
 }
