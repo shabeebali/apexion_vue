@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'timezone' => Illuminate\Support\Facades\Cache::has('timezone')? Illuminate\Support\Facades\Cache::get('timezone') : 'Asia/Kolkata',
+    'timezone' => 'Asia/Kolkata',//Illuminate\Support\Facades\Cache::has('timezone')? Illuminate\Support\Facades\Cache::get('timezone') : 'Asia/Kolkata',
 
     /*
     |--------------------------------------------------------------------------
