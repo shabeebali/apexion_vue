@@ -168,6 +168,70 @@ class ProductController extends Controller
             'count'=> Product::where([['tally','=',0],['publish','=',1]])->get()->count()
         ]);
     }
+    public function view(Request $request,$id)
+    {
+        $category_types = CategoryType::all();
+        $warehouses = Warehouse::all();
+        $pricelists = Pricelist::all();
+        $obj = Product::find($id);
+        $data=[];
+        $fields = helper('apex')->get_fields('product');
+        $temp =[];
+        foreach ($fields as $key => $value) {
+            if(isset($value['avoid']) && $value['avoid']){
+                continue;
+            }
+            $temp[] = [
+                'key'=>$value['text'],
+                'value'=> $obj->$key
+            ];
+        }
+        $temp[] = [
+            'key'=>'SKU',
+            'value'=>$obj->sku
+        ];
+        $cats = $obj->categories()->get();
+        foreach ($category_types as $type) {
+            $temp[] = [
+                'key'=>$type->name,
+                'value'=>$obj->categories()->where('type_id',$type->id)->first()->name,
+            ];
+        }
+        $data['items'][]=[
+            'name'=>'Details',
+            'list'=>$temp,
+        ];
+        $temp=[];
+        $pricelists = Pricelist::all();
+        foreach ($pricelists as $pricelist) {
+            $v = $obj->pricelists()->where('pricelist_id',$pricelist->id)->first();
+            $temp[] = [
+                'key'=>$pricelist->name.' Margin',
+                'value'=>$v->pivot->value
+            ];
+            $temp[] = [
+                'key'=>$pricelist->name.' Price',
+                'value'=>number_format( ceil( ($obj->landing_price*(( $v->pivot->value/100 )+1))*(($obj->gst/100)+1) ),2,'.',',' ),
+            ];
+        }
+        foreach ($warehouses as $warehouse) {
+            $v = $obj->warehouses()->where('warehouse_id',$warehouse->id)->first();
+            $temp[] =[
+                'key'=>'Warehouse '.$warehouse->name.' Stock',
+                'value'=> $v->pivot->stock,
+            ];
+        }
+        $data['items'][] = [
+            'name'=>'Pricelist & Stock',
+            'list'=>$temp,
+        ];
+        return response()->json([
+            'data'=>[
+                'name'=>$obj->name,
+                'items' => $data['items'],
+            ],
+        ]);
+    }
     public function add(){
         $user = \Auth::user();
         $category_types = CategoryType::all();
@@ -241,10 +305,10 @@ class ProductController extends Controller
         //dd($request);
         $category_types = CategoryType::all();
         $warehouses = Warehouse::all();
+        $pricelists = Pricelist::all();
         $val_array = [
             'name' => 'required|unique:products',
             'weight' => 'numeric',
-            'stock' => 'integer',
             'mrp' => 'numeric',
             'landing_price' => 'numeric',
             'general_selling_price' => 'numeric',
@@ -269,6 +333,9 @@ class ProductController extends Controller
         $fields = helper('apex')->get_fields('product');
         $obj = new Product;
         foreach ($fields as $key => $value) {
+            if(isset($value['avoid']) && $value['avoid']){
+                continue;
+            }
             $obj->$key = $request->$key;
         }
         $obj->name = trim($obj->name);
@@ -294,12 +361,18 @@ class ProductController extends Controller
         $p_code = helper('apex')->make_unique_code($p_code);
         $obj->sku = $p_code;
         $obj->save();
-        $pricelists = Pricelist::all();
+        
         foreach ($pricelists as $pl) {
             $obj->pricelists()->attach($pl->id,[
                 'value'=> $request->get($pl->slug) ? $request->get($pl->slug):0
             ]);
         }
+        $warehouses = Warehouse::all();
+        $arr=[];
+        foreach ($warehouses as $wh) {
+            $arr[$wh->id] = ['stock'=>$request->get('warehouse_'.$wh->slug) ? $request->get('warehouse_'.$wh->slug):0];
+        }
+        $obj->warehouses()->sync($arr);
         return response()->json([
             'message'=>'success'
         ]);
@@ -405,7 +478,6 @@ class ProductController extends Controller
                 Rule::unique('products')->ignore($id)
             ],
             'weight' => 'numeric',
-            'stock' => 'integer',
             'mrp' => 'numeric',
             'landing_price' => 'numeric',
             'general_selling_price' => 'numeric',
@@ -430,6 +502,9 @@ class ProductController extends Controller
         $fields = helper('apex')->get_fields('product');
         $obj = Product::find($id);
         foreach ($fields as $key => $value) {
+            if(isset($value['avoid']) && $value['avoid']){
+                continue;
+            }
             $obj->$key = $request->$key;
         }
         $obj->name = trim($obj->name);
@@ -495,10 +570,10 @@ class ProductController extends Controller
         $file = $request->file('file');
         $method = $request->method;
         //dd($file->extension());
-        if($file->extension() != 'xlsx')
+        if($file->extension() != 'xlsx' && $file->extension() != 'zip')
         {
             return response()->json([
-                'status' => 'failed',
+                'status' => 'file_failed',
                 'message' => 'Error: The uploaded file is not valid. Please try again'
             ]);
         }
@@ -626,6 +701,7 @@ class ProductController extends Controller
         }
         $obj = Pricelist::find($id);
         $obj->name = $request->name;
+        $obj->slug = Str::slug($request->name,'_');
         $obj->save();
         return response()->json([
             'message'=>'success',

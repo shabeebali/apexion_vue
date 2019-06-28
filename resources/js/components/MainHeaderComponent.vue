@@ -2,29 +2,30 @@
     <div>
       <v-toolbar dense app clipped-left clipped-right fixed dark color="teal darken-4">
         <v-toolbar-side-icon v-if="$vuetify.breakpoint.smAndDown" @click="$emit('sidebar-toggle')"></v-toolbar-side-icon>
-        <v-btn icon @click.stop="main_menu_dialog = true">
-            <v-icon>apps</v-icon>
+        <v-btn icon @click.stop="main_menu_dialog = true" title="Apps Menu">
+          <v-icon>apps</v-icon> 
         </v-btn>
-
-        <v-toolbar-title class="white--text">Title</v-toolbar-title>
-
+        <img src="/images/apexion_logo.svg"/>
         <v-spacer></v-spacer>
-
-        <v-btn icon>
-          <v-icon>search</v-icon>
-        </v-btn>
-
-        <v-btn icon>
-          <v-icon>apps</v-icon>
-        </v-btn>
-
-        <v-btn icon @click="logout">
-          <v-icon>logout</v-icon>
-        </v-btn>
-
-        <v-btn icon>
-          <v-icon>more_vert</v-icon>
-        </v-btn>
+        Welcome {{username}}
+        <v-menu offset-y>
+          <template v-slot:activator="{ on }">
+            <v-btn
+              v-on="on"
+              icon
+            >
+              <v-icon>more_vert</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-tile @click="profile">
+              <v-list-tile-title>Profile</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="logout">
+              <v-list-tile-title>Logout</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
       </v-toolbar>
       <v-dialog v-model="main_menu_dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
           <v-card color="teal" :style="{background: menuBackground, backgroundSize:'cover'}">
@@ -59,21 +60,30 @@
             return {
               main_menu_dialog: false,
               //main_menu_items : '',
-              menuBackground:'url("'+this.$asset+'/svg/apexion_logo.svg")'
+              menuBackground:'url("'+this.$asset+'/svg/apexion_logo.svg")',
+              username : '',
             }
         },
         props:['main_menu_items'],
         created:function(){
 
         },
+        mounted(){
+          axios.get('/user').then((response)=>{
+            this.username = response.data.username
+          })
+        },
         methods:{
             logout:function(){
-                axios.post('http://localhost/apexion/public/logout').then(
+                axios.post('http://localhost:8000/logout').then(
                     function(response){
                         localStorage.removeItem('token');
-                        window.location = 'http://localhost/apexion/public';
+                        window.location = 'http://localhost:8000';
                     }
                 )
+            },
+            profile(){
+
             }
         }
     }

@@ -10,6 +10,11 @@ use Illuminate\Validation\Rule;
 use Konekt\Acl\Models\Role;
 use Konekt\Acl\Models\Permission;
 use Illuminate\Support\Facades\Hash;
+use App\Modules\Settings\Models\Zone;
+use App\Modules\Settings\Models\GeneralSettings;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Artisan;
 use Validator;
 
 class ConfigController extends Controller
@@ -30,6 +35,13 @@ class ConfigController extends Controller
     {
         $user = \Auth::user();
         $items = [];
+        if($user->can('access_settings')){
+            $items[]=[
+                'text'=>'General Settings',
+                'route'=>'/settings/general',
+                'icon'=>'settings'
+            ];
+        }
         if($user->can('list_users')){
             $items[]=[
                 'text'=>'Users',
@@ -358,5 +370,26 @@ class ConfigController extends Controller
         return response()->json([
             'permissions' => $permissions
         ]);
+    }
+    public function zones()
+    {
+        $objs = Zone::all();
+        $data = [];
+        foreach ($objs as $obj) {
+            $data[]=$obj->zone_name;
+        }
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+    public function settings_save(Request $request)
+    {
+        GeneralSettings::updateOrCreate(
+            ['id'=>1],
+            ['zone'=>$request->zone]
+        );
+        Cache::forget('timezone');
+        Cache::put('timezone',$request->zone);
+        Artisan::call('config:cache');
     }
 }

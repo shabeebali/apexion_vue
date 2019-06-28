@@ -26,6 +26,9 @@
 							<v-flex xs12 lg3 md4 sm4 px-4>
 								<v-select label="Category Type" :items="types" v-model="type_id" :error-messages="type_error"></v-select>
 							</v-flex>
+							<v-flex xs12 lg3 md4 sm4 px-4>
+								<v-select label="Method" :items="methods" v-model="method" :error-messages="method_error"></v-select>
+							</v-flex>
 							<v-flex xs12 pa-3>
 								<v-btn color="blue" dark @click="upload">
 									Upload
@@ -58,6 +61,18 @@
 				types:[],
 				type_id:0,
 				type_error:'',
+				method:'create',
+				method_error:'',
+				methods:[
+					{
+						'text':'Create',
+						'value':'create'
+					},
+					{
+						'text':'Update',
+						'value':'update'
+					}
+				],
 				breadcrumbs:[
                     {
                         text:'Home',
@@ -110,6 +125,7 @@
 					var fD = new FormData()
 					fD.append('file',this.file)
 					fD.append('type_id',this.type_id)
+					fD.append('method',this.method)
 					axios.post('/products/categories/import',fD,{
 						headers: {
 					        'Content-Type': 'multipart/form-data'
@@ -125,6 +141,11 @@
 								str+='</ul></p>'
 							})
 							this.alert_messages = str;
+							this.alert_type = 'error'
+							this.alert = true
+						}
+						if(response.status == 200 && response.data.status == 'file_failed'){
+							this.alert_messages = response.data.message
 							this.alert_type = 'error'
 							this.alert = true
 						}

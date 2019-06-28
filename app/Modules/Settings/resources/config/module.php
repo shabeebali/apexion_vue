@@ -1,7 +1,7 @@
 <?php
 return [
     'menu' => [
-        'route' => '/settings/users/list',
+        'route' => '/settings/general',
         'name' => 'Settings',
         'icon' => 'settings',
         'permission' => 'access_settings'

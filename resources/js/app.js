@@ -12,10 +12,10 @@ Vue.use(Vuetify)
 Vue.use(VueRouter)
 const router = new VueRouter({
   routes,
-  base:'/erp/admin',
+  base:'/admin', // /er/admin
   mode:'history',
 });
-Vue.prototype.$asset = '/erp/'
+Vue.prototype.$asset = '/' // /erp/
 Vue.mixin({
   methods: {
     confirmDialog(msg) {

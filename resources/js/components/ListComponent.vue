@@ -162,10 +162,10 @@
                         </td>
                         <td v-else-if="key == 'name'">
                             <v-layout row wrap align-content-space-between>
-                                <v-flex align-self-center>
+                                <v-flex xs10 align-self-center>
                                     <router-link :to="'view/'+props.item.id">{{it}}</router-link>
                                 </v-flex>
-                                <v-flex align-self-center class="text-xs-right">
+                                <v-flex xs2 align-self-center class="text-xs-right">
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
                                             <v-btn icon v-on="on" @click="textCopy(props.item.name)">

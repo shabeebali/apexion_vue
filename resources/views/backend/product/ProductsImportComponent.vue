@@ -118,6 +118,11 @@
 							this.alert_type = 'error'
 							this.alert = true
 						}
+						if(response.status == 200 && response.data.status == 'file_failed'){
+							this.alert_messages = response.data.message
+							this.alert_type = 'error'
+							this.alert = true
+						}
 						if(response.status == 200 && response.data.status == 'success'){
 							this.alert_messages = response.data.message
 							this.alert_type = 'success'

@@ -29,7 +29,7 @@
                                 <v-select label="Category Type" v-model="formdata.type_id.value" :items="category_type.options"></v-select>
                             </v-flex>
                             <v-flex xs12>
-                                <v-text-field label="Code*" :error-messages="formdata.code.error" v-model="formdata.code.value"></v-text-field>
+                                <v-text-field label="Code*" :error-messages="formdata.code.error" v-model="formdata.code.value" :readonly="formdata.code.readonly"></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -57,7 +57,8 @@ export default{
                 },
                 'code':{
                     'value':'',
-                    'error':''
+                    'error':'',
+                    'readonly':false,
                 },
                 'type_id':{
                     'value':''
@@ -67,6 +68,12 @@ export default{
             category_type:{
                 'options':[],
             },
+            response:[],
+        }
+    },
+    computed:{
+        type_id(){
+            return this.formdata.type_id.value
         }
     },
     watch:{
@@ -77,6 +84,7 @@ export default{
                 }
                 else{
                     axios.get('products/categories/edit/'+this.id).then((response)=>{
+                        this.response = response.data.formdata
                         if(response.status == 200){
                             Object.keys(response.data.formdata).forEach((key)=>{
                                 this.formdata[key]['value'] = response.data.formdata[key];
@@ -85,6 +93,29 @@ export default{
                     })
                 }
             }
+        },
+        type_id:{
+            handler(){
+                //this.formdata.code.value = ''
+                this.formdata.code.readonly = false
+                Object.keys(this.category_type.options).forEach((key)=>{
+                    if(this.formdata.type_id.value == this.category_type.options[key].value){
+                        if(this.formdata.type_id.value != this.response.type_id){
+                            if(this.category_type.options[key].autogen){
+                                this.formdata.code.readonly = true
+                                this.formdata.code.value = this.category_type.options[key].next_code
+                            }
+                        }
+                        else{
+                            if(this.category_type.options[key].autogen){
+                                this.formdata.code.readonly = true
+                            }
+                            this.formdata.code.value = this.response.code
+                        }
+                    }
+
+                })
+            },
         }
     },
     mounted(){

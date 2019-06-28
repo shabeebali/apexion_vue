@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 */
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+    return response()->json(['username'=>$request->user()->name]);
 });
 Route::middleware('auth:api')->group(function(){
     Route::get('/config/menu','Backend\ConfigController@menuRender');
@@ -37,8 +37,11 @@ Route::middleware('auth:api')->group(function(){
     Route::post('settings/users/roles/edit/{id}','Backend\ConfigController@updateRole');
     Route::get('/acl/role/addconfig','Backend\ConfigController@addRoleConfig');
     Route::post('settings/users/roles/delete','Backend\ConfigController@delete');
+    Route::get('settings/zones','Backend\ConfigController@zones');
+    Route::post('settings/save','Backend\ConfigController@settings_save');
     //Products
     Route::get('products','Backend\ProductController@index');
+    Route::get('products/view/{id}','Backend\ProductController@view');
     Route::get('products/get_menu','Backend\ProductController@getMenu');
     Route::post('products/list_settings','Backend\ProductController@list_settings');
     Route::get('products/filterables','Backend\ProductController@get_filterables');

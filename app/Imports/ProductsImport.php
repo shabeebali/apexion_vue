@@ -9,6 +9,7 @@ use App\Modules\Taxonomy\Models\Category;
 use App\Modules\Taxonomy\Models\CategoryType;
 use App\Modules\ProductCode\Models\CodeOrder;
 use App\Modules\Product\Models\Pricelist;
+use App\Modules\Product\Models\Warehouse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException as IlluminateValidationException;
@@ -33,6 +34,8 @@ class ProductsImport implements ToCollection, WithHeadingRow
     	if($this->method == 'create')
     	{
     		$category_types = CategoryType::all();
+    		$warehouses = Warehouse::all();
+    		$pricelists = Pricelist::all();
     		$cat_val =[];
     		foreach ($category_types as $type) {
 	        	$arr = Category::select('name')->where('type_id',$type->id)->get();
@@ -59,6 +62,9 @@ class ProductsImport implements ToCollection, WithHeadingRow
 	            	'required',
 	            	Rule::in($cat_val[$type->id]),
 	            ];
+	        }
+	        foreach ($warehouses as $warehouse) {
+	            $val_array['warehouse_'.$warehouse->slug] = 'integer';
 	        }
 	        $rows = $rows->toArray();
 	        $validator = Validator::make($rows, $val_array, [], []);
@@ -118,17 +124,24 @@ class ProductsImport implements ToCollection, WithHeadingRow
 		        $p_code = helper('apex')->make_unique_code($p_code);
 		        $obj->sku = $p_code;
 		        $obj->save();
-		        $pricelists = Pricelist::all();
+		        
 		        foreach ($pricelists as $pl) {
 		            $obj->pricelists()->attach($pl->id,[
-		                'value'=> $row[$pl->slug] ? $row[$pl->slug]: 0
+		                'value'=> $row['pricelist_margin_'.$pl->slug] ? $row['pricelist_margin_'.$pl->slug]: 0
 		            ]);
 		        }
+		        $arr=[];
+		        foreach ($warehouses as $wh) {
+		            $arr[$wh->id] = ['stock'=>$row['warehouse_'.$wh->slug] ? $row['warehouse_'.$wh->slug]:0];
+		        }
+		        $obj->warehouses()->sync($arr);
 	    	}
     	}
     	if($this->method == 'update')
     	{
     		$category_types = CategoryType::all();
+    		$warehouses = Warehouse::all();
+    		$pricelists = Pricelist::all();
     		$cat_val =[];
     		foreach ($category_types as $type) {
 	        	$arr = Category::select('name')->where('type_id',$type->id)->get();
@@ -165,7 +178,9 @@ class ProductsImport implements ToCollection, WithHeadingRow
 		            	Rule::in($cat_val[$type->id]),
 		            ];
 		        }
-		        
+		        foreach ($warehouses as $warehouse) {
+		            $val_array['warehouse_'.$warehouse->slug] = 'integer';
+		        }
 		        $validator = Validator::make($row, $val_array, [], []);
 		        if($validator->fails()){
 		        	$e1 = new IlluminateValidationException($validator->errors());
@@ -220,11 +235,16 @@ class ProductsImport implements ToCollection, WithHeadingRow
 		        $p_code = helper('apex')->make_unique_code($p_code,$obj->id);
 		        $obj->sku = $p_code;
 		        $obj->save();
-		        $pricelists = Pricelist::all();
+		        
 		        foreach ($pricelists as $pl) {
-		        	$p_sync_array[$pl->id] = ['value'=>$row[$pl->slug] ? $row[$pl->slug]:0];
+		        	$p_sync_array[$pl->id] = ['value'=>$row['pricelist_margin_'.$pl->slug] ? $row['pricelist_margin_'.$pl->slug]:0];
 		        }
 		        $obj->pricelists()->sync($p_sync_array);
+		        $arr=[];
+		        foreach ($warehouses as $wh) {
+		            $arr[$wh->id] = ['stock'=>$row['warehouse_'.$wh->slug] ? $row['warehouse_'.$wh->slug]:0];
+		        }
+		        $obj->warehouses()->sync($arr);
 		        $count++;
 	    	}
 	    	

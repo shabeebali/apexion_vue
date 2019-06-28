@@ -7,14 +7,12 @@ import SettingsUsersRolesList from '../views/backend/settings/UserRolesListCompo
 import SettingsUserRoleIndex from '../views/backend/settings/UserRoleIndexComponent.vue'
 import SettingsUserRoleAdd from '../views/backend/settings/UserRoleAddComponent.vue'
 import SettingsUserRoleEdit from '../views/backend/settings/UserRoleEditComponent.vue'
-
-import SettingsAcl from '../views/backend/settings/acl/IndexComponent.vue'
-import SettingsAclPermissions from '../views/backend/settings/acl/PermissionsComponent.vue'
-import SettingsAclRoles from '../views/backend/settings/acl/RolesComponent.vue'
+import SettingsGeneral from '../views/backend/settings/GeneralComponent.vue'
 import DashboardIndex from '../views/backend/dashboard/IndexComponent.vue'
 
 import ProductsIndex from '../views/backend/product/ProductsIndexComponent.vue'
 import ProductsList from '../views/backend/product/ProductsListComponent.vue'
+import ProductsView from '../views/backend/product/ProductsViewComponent.vue'
 import ProductsPendingList from '../views/backend/product/ProductsPendingListComponent.vue'
 import ProductsTallyList from '../views/backend/product/ProductsTallyListComponent.vue'
 import ProductsAdd from '../views/backend/product/ProductsAddComponent.vue'
@@ -77,8 +75,12 @@ export const routes=[
                             }
                         ]
                     }, 
-                ]
+                ],               
             },
+            {
+                path:'general',
+                component:SettingsGeneral,
+            }
             
         ]
     },
@@ -106,6 +108,10 @@ export const routes=[
             {
                 path:'edit/:id',
                 component:ProductsEdit,
+            },
+            {
+                path:'view/:id',
+                component:ProductsView,
             },
             {
                 path:'import',

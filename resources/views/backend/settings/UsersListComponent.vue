@@ -52,10 +52,10 @@ export default{
     },
     methods:{
         editItem($event){
-            this.$router.push('users/edit/'+$event)
+            this.$router.push('edit/'+$event)
         },
         redirectAdd(){
-            this.$router.push('users/add')
+            this.$router.push('add')
         }
     }   
 }

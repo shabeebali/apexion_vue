@@ -49,14 +49,14 @@ class TaxonomyController extends Controller
         $cat_types = CategoryType::all();
         $category_types = [];
         foreach ($cat_types as $type) {
-            $category_types[]=['text' => $type->name, 'value' => $type->id];
+            $category_types[]=['text' => $type->name, 'value' => $type->id, 'autogen' => $type->autogen? 1: 0, 'next_code'=>$type->next_code];
         }
         $formdata =[
             'name'=>[
                 'value'=>'', 'error'=>''
             ],
             'code' =>[
-                'value'=>'', 'error'=>''
+                'value'=>'', 'error'=>'',
             ],
             'type_id' =>[
                 'value' => $category_types[0]['value']
@@ -91,8 +91,16 @@ class TaxonomyController extends Controller
         $obj->name = trim($request->name);
         $obj->slug = Str::slug($obj->name,'_');
         $obj->type_id = $request->type_id;
-        $obj->code = $request->code;
+        if($category_type->autogen)
+        {
+            $obj->code = strtoupper($category_type->next_code);
+        }
+        else
+        {
+            $obj->code = strtoupper($request->code);
+        }
         $obj->save();
+        helper('apex')->update_next_code($category_type);
         return response()->json([
             'message'=> 'success'
         ]);
@@ -129,7 +137,7 @@ class TaxonomyController extends Controller
         $obj->name = trim($request->name);
         $obj->slug = Str::slug($obj->name,'_');
         $obj->type_id = $request->type_id;
-        $obj->code = $request->code;
+        $obj->code = strtoupper($request->code);
         $obj->save();
         return response()->json([
             'message'=> 'success'
@@ -194,6 +202,20 @@ class TaxonomyController extends Controller
         $object->code_type = $request->code_type;
         $object->autogen = $request->autogen;
         $object->in_pc = $request->in_pc;
+        $next_code='';
+        if($request->autogen && $request->in_pc)
+        {
+            $ct_arr = explode('-',$request->code_type);
+            foreach ($ct_arr as $key => $value) {
+                if($value == 'alpha'){
+                    $next_code = $next_code.'A';
+                }
+                else{
+                    $next_code = $next_code.'0';
+                }
+            }
+            $object->next_code = $next_code;
+        }
         $object->save();
         $code_order = new CodeOrder;
         if($request->in_pc){
@@ -206,6 +228,7 @@ class TaxonomyController extends Controller
         $cat->slug = Str::slug($cat->name,'_');
         $cat->type_id = $object->id;
         $cat->code = str_pad('', $object->code_length,"N");
+
         $cat->save();
         return response()->json([
             'message'=>'success',
@@ -298,19 +321,21 @@ class TaxonomyController extends Controller
     }
     public function import(Request $request)
     {
+        //dd($request->toArray());
         $type_id = $request->type_id;
         $file = $request->file('file');
+        $method =  $request->method;
         //dd($file->extension());
-        if($file->extension() != 'xlsx')
+        if($file->extension() != 'xlsx' && $file->extension() != 'zip')
         {
             return response()->json([
-                'status' => 'failed',
+                'status' => 'file_failed',
                 'message' => 'Error: The uploaded file is not valid. Please try again'
             ]);
         }
         else{
             try {
-                $import = new CategoriesImport($type_id);
+                $import = new CategoriesImport($type_id,$method);
                 $import->import($request->file('file'));
             } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
 

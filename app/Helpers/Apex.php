@@ -2,6 +2,7 @@
 namespace App\Helpers;
 use Validator;
 use Konekt\Concord\Facades\Concord;
+use Illuminate\Support\Facades\Cache;
 class Apex
 {
     public function data_filter($data,$filterables,$request)
@@ -123,6 +124,31 @@ class Apex
                             'type' => $filter['type']
                         ];
                     }
+                    if($filter['type'] == 'slider')
+                    {
+                        $limit = explode(",",$request->get($key));
+                        $data = $data->filter(function($item) use($request,$key,$filter,$limit){
+                            $related_func = $filter['relation_func'];
+                            $pivot_name = $filter['pivot_column'];
+                            $its = $item->$related_func()->get();
+                            $total = 0;
+                            foreach ($its as $it) {
+                                $total = $total + $it->pivot->$pivot_name;
+                            }
+                            if($total >= $limit[0] && $total <=$limit[1])
+                            {
+                                return true;
+                            }
+                            return false;
+                        });
+                        $filtered[]=
+                        [
+                            'key' => $key,
+                            'range' => $limit,
+                            'name' => $filter['name'],
+                            'type' => $filter['type']
+                        ];
+                    }
                 }
             }
         }
@@ -140,7 +166,7 @@ class Apex
             }
         }
         foreach ($filterable as $key => $arr) {
-            if($arr['type'] == 'slider')
+            if($arr['type'] == 'slider'&& $arr['relation'] == 'none')
             {
                 $filterable[$key]['max_value'] = ceil($class::max($key));
                 $filterable[$key]['min_value'] = floor($class::min($key));
@@ -192,6 +218,28 @@ class Apex
                     }
                     $filterable[$key]['options'] = $temp;
                     $filterable[$key]['value'] = '';
+                }
+                if($arr['type'] == 'slider')
+                {
+                    $related_func = $arr['relation_func'];
+                    $pivot_name = $arr['pivot_column'];
+                    $objs = $class::select('id')->get();
+                    $val_array = [];
+                    foreach ($objs as $obj){
+                        $its = $obj->$related_func()->get();
+                        $temp = 0;
+                        foreach ($its as $it) {
+                            $temp = $temp + $it->pivot->$pivot_name; 
+                        }
+                        $val_array[] = $temp;
+                    }
+                    if(count($val_array) == 0){
+                        $val_array = [0];
+                    }
+                    $filterable[$key]['max_value'] = ceil(max($val_array));
+                    $filterable[$key]['min_value'] = floor(min($val_array));
+                    $filterable[$key]['range'] = [floor(min($val_array)), ceil(max($val_array))];
+                    $filterable[$key]['default'] = [floor(min($val_array)), ceil(max($val_array))];
                 }
             }
         }
@@ -265,10 +313,20 @@ class Apex
                 $arr = $dat->toArray();
                 $new_arr =[];
                 foreach ($select_array as $select_term) {
-                    if(array_key_exists($select_term,$filterables) && $filterables[$select_term]['relation'] != 'none')
+                    if(array_key_exists($select_term,$filterables) && $filterables[$select_term]['relation'] == 'many2one')
                     {
                         $func_name = substr($select_term,0,strlen($select_term)-3);
                         $new_arr[$select_term] = $dat->$func_name()->first()->name;
+                    }
+                    elseif (array_key_exists($select_term,$filterables) && $filterables[$select_term]['relation'] == 'one2many') {
+                        $related_func = $filterables[$select_term]['relation_func'];
+                        $pivot_name = $filterables[$select_term]['pivot_column'];
+                        $its = $dat->$related_func()->get();
+                        $total = 0;
+                        foreach ($its as $it) {
+                            $total = $total+ $it->pivot->$pivot_name;
+                        }
+                        $new_arr[$select_term] = $total;
                     }
                     else
                     {
@@ -327,5 +385,49 @@ class Apex
             }
         }
         return $pc;
+    }
+    public function update_next_code($cat_type)
+    {
+        if($cat_type->autogen && $cat_type->in_pc)
+        {
+            $cc = $cat_type->next_code;
+            $ct = $cat_type->code_type;
+            $cl = $cat_type->code_length;
+            $ct_arr = explode('-',$ct);
+            $cc_arr = str_split($cc);
+            $jump_next = 1;
+            for($i=$cl-1 ; $i>=0 ; $i--){
+                if($ct_arr[$i] == 'alpha'){
+                    if($jump_next){
+                        $curr = $cc_arr[$i];
+                        $next = chr(((ord($cc_arr[$i])-65+1)%26)+65);
+                        $cc_arr[$i] = $next;
+                    }
+                    if($curr== 'Z' && $next == 'A'){
+                        $jump_next = 1;
+                    }
+                    else{
+                        $jump_next = 0;
+                    }
+                }
+                else{
+                    if($jump_next){
+                        $curr = $cc_arr[$i];
+                        $next = chr(((ord($cc_arr[$i])-48+1)%10)+48);
+                        $cc_arr[$i] = $next;
+                    }
+                    if($curr== '9' && $next == '0'){
+                        $jump_next = 1;
+                    }
+                    else{
+                        $jump_next = 0;
+                    }
+                }
+            }
+            $cc = implode("",$cc_arr);
+            $cat_type->next_code = $cc;
+            $cat_type->save();
+        }
+        return NULL;
     }
 }

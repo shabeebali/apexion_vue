@@ -90,13 +90,6 @@
                                         </v-flex>
                                     </v-layout>
                                 </v-flex>
-                                <v-flex lg6 md6 xs12>
-                                    <v-layout row wrap align-center fill-height>
-                                        <v-flex px-4 >
-                                            <v-text-field box readonly label="Product Code" type="text"></v-text-field>
-                                        </v-flex>
-                                    </v-layout>
-                                </v-flex>
                             </v-layout>
                         </v-card>
                     </v-tab-item>
