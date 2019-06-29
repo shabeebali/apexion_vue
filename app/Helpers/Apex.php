@@ -225,21 +225,34 @@ class Apex
                     $pivot_name = $arr['pivot_column'];
                     $objs = $class::select('id')->get();
                     $val_array = [];
-                    foreach ($objs as $obj){
-                        $its = $obj->$related_func()->get();
-                        $temp = 0;
-                        foreach ($its as $it) {
-                            $temp = $temp + $it->pivot->$pivot_name; 
+                    if(Cache::has($module.'_'.$pivot_name.'_max') && Cache::has($module.'_'.$pivot_name.'_min'))
+                    {
+                        $max_val = Cache::get($module.'_'.$pivot_name.'_max');
+                        $min_val = Cache::get($module.'_'.$pivot_name.'_min');
+                    }
+                    else
+                    {
+                        foreach ($objs as $obj){
+                            $its = $obj->$related_func()->get();
+                            $temp = 0;
+                            foreach ($its as $it) {
+                                $temp = $temp + $it->pivot->$pivot_name; 
+                            }
+                            $val_array[] = $temp;
                         }
-                        $val_array[] = $temp;
+                        if(count($val_array) == 0){
+                            $val_array = [0];
+                        }
+                        $max_val = max($val_array);
+                        $min_val = min($val_array);
+                        Cache::put($module.'_'.$pivot_name.'_max',$max_val);
+                        Cache::put($module.'_'.$pivot_name.'_min',$min_val);
                     }
-                    if(count($val_array) == 0){
-                        $val_array = [0];
-                    }
-                    $filterable[$key]['max_value'] = ceil(max($val_array));
-                    $filterable[$key]['min_value'] = floor(min($val_array));
-                    $filterable[$key]['range'] = [floor(min($val_array)), ceil(max($val_array))];
-                    $filterable[$key]['default'] = [floor(min($val_array)), ceil(max($val_array))];
+                    
+                    $filterable[$key]['max_value'] = ceil($max_val);
+                    $filterable[$key]['min_value'] = floor($min_val);
+                    $filterable[$key]['range'] = [floor($min_val), ceil($max_val)];
+                    $filterable[$key]['default'] = [floor($min_val), ceil($max_val)];
                 }
             }
         }

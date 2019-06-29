@@ -21,6 +21,10 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/validate_token',function(){
         return 'validated';
     });
+    //Dashboard
+    Route::get('dashboard','Backend\DashboardController@dashboard');
+    Route::get('dashboard/quote','Backend\DashboardController@quote');
+    //Settings
     Route::get('settings/get_menu','Backend\ConfigController@getMenu');
     Route::get('settings/permissions','Backend\ConfigController@permissions');
     Route::get('settings/users','Backend\ConfigController@users');
@@ -49,6 +53,7 @@ Route::middleware('auth:api')->group(function(){
     Route::get('products/edit/{id}','Backend\ProductController@edit');
     Route::post('products/edit/{id}','Backend\ProductController@update');
     Route::post('products/delete','Backend\ProductController@delete');
+    Route::post('products/tally_sync','Backend\ProductController@tally_sync');
     Route::get('products/export','Backend\ProductController@export');
     Route::post('products/import','Backend\ProductController@import');
     Route::post('/products/add','Backend\ProductController@save');

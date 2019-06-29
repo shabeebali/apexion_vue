@@ -77,7 +77,7 @@
 						this.formdata.error = response.data.errors.name[0]
 					}
 					if(response.status == 200 && response.data.message == 'success'){
-						this.$router.push('/settings/users/roles')
+						this.$router.push('/settings/users/roles/list')
 					}
 				})
 			},

@@ -124,7 +124,7 @@
 						})
 					}
 					if(response.data.message == 'success'){
-						this.$router.push('/settings/users')
+						this.$router.push('/settings/users/list')
 					}
 				})
 			},

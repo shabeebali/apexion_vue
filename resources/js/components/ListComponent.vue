@@ -193,6 +193,7 @@
                 <template v-slot:footer v-if="deleteManyFlag">
                     <v-layout class="justify-start">
                         <v-btn @click="deleteMany" color="error" :disabled="selected.length == 0">Delete</v-btn>
+                        <v-btn v-if="extraButton" @click="extraBtnMethod" color="success" :disabled="selected.length == 0">{{extraButtonLabel}}</v-btn>
                     </v-layout>
                 </template>
             </v-data-table>
@@ -322,6 +323,18 @@ export default{
         'importable':{
             type:Boolean,
             default:false
+        },
+        'extraButton':{
+            type:Boolean,
+            default:false,
+        },
+        'extraButtonLabel':{
+            type:String,
+            default:''
+        },
+        'extraButtonRoute':{
+            type:String,
+            default:''
         }
     },
     computed:{
@@ -633,6 +646,25 @@ export default{
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
+        },
+        extraBtnMethod(){
+            this.loadingDialog=true
+            var Ids = new Array()
+            this.selected.forEach((item)=>{
+                Ids.push(item.id)
+            })
+            var fD = new FormData()
+            fD.append('ids',Ids)
+            axios.post(this.baseRoute.substr(0,this.baseRoute.indexOf('?'))+'/'+this.extraButtonRoute,fD).then((response)=>{
+                if(response.status == 200 && response.data.message == 'success'){
+                    this.loadingDialog = false
+                    this.updateList()
+                    this.deleteId = new Array()
+                }
+                else{
+                    alert('Something went wrong!')
+                }
+            })
         }
     },
 }

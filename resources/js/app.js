@@ -12,7 +12,7 @@ Vue.use(Vuetify)
 Vue.use(VueRouter)
 const router = new VueRouter({
   routes,
-  base:'/erp/admin', // /er/admin
+  base:'/erp/admin', // /erp/admin
   mode:'history',
 });
 Vue.prototype.$asset = '/erp/' // /erp/

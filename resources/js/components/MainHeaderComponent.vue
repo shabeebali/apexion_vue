@@ -35,6 +35,20 @@
                   </v-btn>
               </v-toolbar>
               <v-layout row wrap px-5 py-5 class="justify-center">
+                 <v-flex xs12 sm4 md2 lg1>
+                  <v-layout column class="align-center">
+                    <v-flex>
+                      <v-btn color="primary" fab dark :large="$vuetify.breakpoint.mdAndUp" :small="$vuetify.breakpoint.xsOnly" :medium="$vuetify.breakpoint.smAndUp" to="/" @click="main_menu_dialog = false">
+                        <v-icon>
+                          dashboard
+                        </v-icon>
+                      </v-btn>
+                    </v-flex>
+                    <v-flex class="white--text font-weight-bold text-uppercase">
+                      Dashboard
+                    </v-flex>
+                  </v-layout>
+                </v-flex>
                 <v-flex xs12 sm4 md2 lg1  v-for="item in main_menu_items" :key="item.index">
                   <v-layout column class="align-center">
                     <v-flex>

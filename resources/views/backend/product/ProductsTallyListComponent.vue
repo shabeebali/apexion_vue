@@ -15,6 +15,9 @@
                 v-on:triggered-update="triggerUpdate=false"
                 v-on:open-add-dialog="redirectAdd"
                 v-on:open-edit-dialog="editItem"
+                extraButton
+                extraButtonLabel="Tally Sync"
+                extraButtonRoute="tally_sync"
                 ></list-component>
             </v-container>
         </v-content>

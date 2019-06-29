@@ -158,14 +158,17 @@ class ProductController extends Controller
     }
     public function pending_count()
     {
+        $user = \Auth::user();
+        
         return response()->json([
-            'count'=> Product::where('publish',0)->get()->count()
+            'count'=> $user->can('approve_product') ? Product::where('publish',0)->get()->count() : 0,
         ]);
     }
     public function tally_count()
     {
+        $user = \Auth::user();
         return response()->json([
-            'count'=> Product::where([['tally','=',0],['publish','=',1]])->get()->count()
+            'count'=> $user->can('sync_tally') ? Product::where([['tally','=',0],['publish','=',1]])->get()->count() : 0
         ]);
     }
     public function view(Request $request,$id)
@@ -711,5 +714,17 @@ class ProductController extends Controller
     {
         $id = $request->id;
         Pricelist::destroy($id);
+    }
+    public function tally_sync(Request $request)
+    {
+        $ids = explode(",",$request->ids);
+        foreach ($ids as $id) {
+            $obj =  Product::find($id);
+            $obj->tally = 1;
+            $obj->save();
+        }
+        return response()->json([
+            'message'=>'success',
+        ]);
     }
 }

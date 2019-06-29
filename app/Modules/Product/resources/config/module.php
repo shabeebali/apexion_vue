@@ -59,6 +59,7 @@ return [
                 'group_class'=>'App\Modules\Taxonomy\Models\CategoryType',
                 'group_relation' => 'type'
             ],
+            
             'stock'=>[
                 'name'=>'Stock',
                 'type'=>'slider',
@@ -66,6 +67,7 @@ return [
                 'relation_func'=>'warehouses',
                 'pivot_column'=>'stock',
             ]
+            
         ],
     ],
     'fields'=>[
@@ -106,10 +108,12 @@ return [
             'description'=>[
                 'text' => 'Description'
             ],
+            
             'stock'=>[
                 'text'=>'Stock',
                 'avoid'=>true
             ]
+            
         ]
     ]
 ];

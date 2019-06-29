@@ -12,6 +12,7 @@
                 :filterables="filterables"
                 :listSettingsRoute="listSettingsRoute"
                 :triggerUpdate="triggerUpdate"
+                
                 v-on:triggered-update="triggerUpdate=false"
                 v-on:open-add-dialog="redirectAdd"
                 v-on:open-edit-dialog="editItem"
