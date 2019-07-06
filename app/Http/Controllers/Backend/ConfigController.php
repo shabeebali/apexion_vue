@@ -64,6 +64,7 @@ class ConfigController extends Controller
         $user = \Auth::user();
         $headers=[];
         $select_array = ['id','name','email'];
+        $data = User::select($select_array);
         $list_terms = helper('apex')->get_list_terms($request,'user',$select_array,['name','email']);
         if($request->get('search')){
             $data = $data->where($list_terms['search']);
@@ -310,6 +311,7 @@ class ConfigController extends Controller
         $user = \Auth::user();
         $headers=[];
         $select_array = ['id','name'];
+        $data = Role::select($select_array);
         $list_terms = helper('apex')->get_list_terms($request,'role',$select_array,['name']);
         if($request->get('search')){
             $data = $data->where($list_terms['search']);
