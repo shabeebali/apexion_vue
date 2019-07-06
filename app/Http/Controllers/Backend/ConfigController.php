@@ -66,11 +66,7 @@ class ConfigController extends Controller
         $select_array = ['id','name','email'];
         $list_terms = helper('apex')->get_list_terms($request,'user',$select_array,['name','email']);
         if($request->get('search')){
-            $data = User::where(function($query) use ($list_terms){
-               foreach ($list_terms['search'] as $search_string) {
-                    $query->orWhere($search_string[0],$search_string[1],$search_string[2]);
-                } 
-            });
+            $data = $data->where($list_terms['search']);
         }
         $list = helper('apex')->perform_filtering($data,$select_array,$request,'user',User::class);
         $json = [
@@ -316,11 +312,7 @@ class ConfigController extends Controller
         $select_array = ['id','name'];
         $list_terms = helper('apex')->get_list_terms($request,'role',$select_array,['name']);
         if($request->get('search')){
-            $data = Role::where(function($query) use ($list_terms){
-               foreach ($list_terms['search'] as $search_string) {
-                    $query->orWhere($search_string[0],$search_string[1],$search_string[2]);
-                } 
-            });
+            $data = $data->where($list_terms['search']);
         }
         $list = helper('apex')->perform_filtering($data,$select_array,$request,'role',Role::class);
         $json = [
