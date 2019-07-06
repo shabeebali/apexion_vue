@@ -65,7 +65,12 @@ class ProductController extends Controller
             {
                 $select_array[array_search('id', $select_array)] = 'products.id';
             }
+            else
+            {
+                array_push($select_array, 'products.id');
+            }
         }
+        //dd($select_array);
         $list_terms = helper('apex')->get_list_terms($request,'product',$select_array,$this->searcheable);
         $data = Product::select($select_array);
         if($request->pending)
