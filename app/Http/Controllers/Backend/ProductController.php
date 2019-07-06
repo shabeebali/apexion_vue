@@ -682,5 +682,6 @@ class ProductController extends Controller
             $obj->stock = $total;
             $obj->save();
         }
+        return 'Done';
     }
 }
