@@ -30,3 +30,4 @@ Route::middleware('auth')->group(function(){
     });
     Route::get('/generate_token','Auth\ApexionController@generate_token');
 });
+Route::get('/test','Backend\ProductController@temp');

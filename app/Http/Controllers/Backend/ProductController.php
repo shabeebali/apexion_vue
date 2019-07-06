@@ -669,4 +669,18 @@ class ProductController extends Controller
             'message'=>'success',
         ]);
     }
+    public function temp()
+    {
+        $objs = Product::all();
+        $warehouses = Warehouse::all();
+        foreach ($objs as $obj) {
+            $total = 0;
+            foreach ($warehouses as $warehouse) {
+                $v = $obj->warehouses()->where('warehouse_id',$warehouse->id)->first();
+                $total = $total + $v->pivot->stock;
+            }
+            $obj->stock = $total;
+            $obj->save();
+        }
+    }
 }
