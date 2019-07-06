@@ -413,8 +413,8 @@ class ProductController extends Controller
             'npc_category_types'=>$npc_category_types,
             'pricelist'=>$pl,
             'warehouse' => $wh,
-            'pendingflag' => $user->can('approve_product')? '1': '0',
-            'tallyflag' => $user->can('sync_tally')? '1': '0',
+            'pendingflag' => $user->can('approve_product')? 1: 0,
+            'tallyflag' => $user->can('sync_tally')? 1: 0,
         ]);
     }
     public function update(Request $request,$id)

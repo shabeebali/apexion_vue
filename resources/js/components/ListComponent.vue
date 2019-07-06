@@ -194,10 +194,12 @@
                         No data available. Please Add.
                     </v-alert>
                 </template>
-                <template v-slot:footer v-if="deleteManyFlag">
+                <template v-slot:footer>
                     <v-layout class="justify-start">
-                        <v-flex xs12>
+                        <v-flex xs12 v-if="deleteManyFlag">
                             <v-btn @click="deleteMany" color="error" :disabled="selected.length == 0">Delete</v-btn>
+                        </v-flex>
+                        <v-flex xs12>
                             <v-btn v-if="extraButton" @click="extraBtnMethod" color="success" :disabled="selected.length == 0">{{extraButtonLabel}}</v-btn>
                         </v-flex>
                     </v-layout>
