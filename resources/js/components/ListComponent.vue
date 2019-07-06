@@ -301,8 +301,8 @@ export default{
                     'value':25
                 },
                 {
-                    'text':'All',
-                    'value':-1
+                    'text':'100',
+                    'value':100
                 }
             ],
             pageControlText:'',
