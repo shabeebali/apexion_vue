@@ -92,7 +92,7 @@
                 axios.post('http://www.apexiondental.com/erp/logout').then(
                     function(response){
                         localStorage.removeItem('token');
-                        window.location = 'hhttp://www.apexiondental.com/erp';
+                        window.location = 'http://www.apexiondental.com/erp';
                     }
                 )
                 /*
