@@ -70,12 +70,9 @@ class ConfigController extends Controller
                foreach ($list_terms['search'] as $search_string) {
                     $query->orWhere($search_string[0],$search_string[1],$search_string[2]);
                 } 
-            })->get();
+            });
         }
-        else{
-            $data = User::all();
-        }
-        $list = helper('apex')->perform_filtering($data,$list_terms['rpp'],$list_terms['page'],$select_array,$request,'user',User::class);
+        $list = helper('apex')->perform_filtering($data,$select_array,$request,'user',User::class);
         $json = [
                 'items'=>$list['items'],
                 'headers'=>$list_terms['headers'],
@@ -83,13 +80,10 @@ class ConfigController extends Controller
                 'fields'=>'',
                 'filterables'=>$list['filterables'],
                 'filtered' => $list['filtered'],
+                'addflag' => $user->can('create_users') ? 1:0, 
+                'exportflag' => 1,
+                'importflag' => $user->can('create_users') && $user->can('create_users') ? 1: 0,
             ];
-        if($user->can('create_users')){
-            $json['addflag'] = 1;
-        }
-        else{
-            $json['addflag'] = 0;
-        }
         
         return response()->json($json);
     }
@@ -326,12 +320,9 @@ class ConfigController extends Controller
                foreach ($list_terms['search'] as $search_string) {
                     $query->orWhere($search_string[0],$search_string[1],$search_string[2]);
                 } 
-            })->get();
+            });
         }
-        else{
-            $data = Role::all();
-        }
-        $list = helper('apex')->perform_filtering($data,$list_terms['rpp'],$list_terms['page'],$select_array,$request,'role',Role::class);
+        $list = helper('apex')->perform_filtering($data,$select_array,$request,'role',Role::class);
         $json = [
                 'items'=>$list['items'],
                 'headers'=>$list_terms['headers'],
