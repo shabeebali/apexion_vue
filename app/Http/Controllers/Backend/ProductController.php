@@ -55,31 +55,35 @@ class ProductController extends Controller
     }
     public function index(Request $request)
     {
+        $user=\Auth::user();
+        $select_array = ['products.id','name','mrp','general_selling_price'];  //
+        $list_settings = ProductListSettings::select('value')->where('user_id',$user->id)->first();
+        if($list_settings)
+        {
+            $select_array = explode(",",$list_settings->value);
+            if(in_array('id', $select_array))
+            {
+                $select_array[array_search('id', $select_array)] = 'products.id';
+            }
+        }
+        $list_terms = helper('apex')->get_list_terms($request,'product',$select_array,$this->searcheable);
+        $data = Product::select($select_array);
         if($request->pending)
         {
-            return $this->pending($request);
+            $data = $data->where('publish',0);
         }
-        if($request->tally)
+        elseif($request->tally)
         {
-            return $this->tally($request);
+            $data = $data->where('tally',0)->where('publish',1);
         }
-        $user=\Auth::user();
-        $headers=[];
-        $select_array = ['id','name','mrp','general_selling_price'];
-        $list_settings = ProductListSettings::select('value')->where('user_id',$user->id)->first();
-        if($list_settings)
+        else
         {
-            $select_array = explode(",",$list_settings->value);
-            array_push($select_array,'id');
+            $data = $data->where('publish',1);
         }
-        $list_terms = helper('apex')->get_list_terms($request,'product',$select_array,$this->searcheable);
         if($request->get('search')){
-            $data = Product::where($list_terms['search'])->where('publish',1)->get();
+            $data = $data->where($list_terms['search']);
         }
-        else{
-            $data = Product::where('publish',1)->get();
-        }
-        $list = helper('apex')->perform_filtering($data,$list_terms['rpp'],$list_terms['page'],$select_array,$request,'product',Product::class);
+        $list = helper('apex')->perform_filtering($data,$select_array,$request,'product',Product::class);
         return response()->json(
             [
                 'items'=>$list['items'],
@@ -88,71 +92,9 @@ class ProductController extends Controller
                 'fields'=>$list_terms['fields'],
                 'filterables'=>$list['filterables'],
                 'filtered' => $list['filtered'],
-                'addflag' => $user->can('list_products') ? 1:0, 
+                'addflag' => $user->can('create_product') ? 1:0, 
                 'exportflag' => 1,
                 'importflag' => $user->can('create_product') && $user->can('edit_product') ? 1: 0,
-            ]
-        );
-    }
-    public function pending(Request $request)
-    {
-        $user=\Auth::user();
-        $headers=[];
-        $select_array = ['id','name','mrp','general_selling_price'];
-        $list_settings = ProductListSettings::select('value')->where('user_id',$user->id)->first();
-        if($list_settings)
-        {
-            $select_array = explode(",",$list_settings->value);
-            array_push($select_array,'id');
-        }
-        $list_terms = helper('apex')->get_list_terms($request,'product',$select_array,$this->searcheable);
-        if($request->get('search')){
-            $data = Product::where($list_terms['search'])->where('publish',0)->get();
-        }
-        else{
-            $data = Product::where('publish',0)->get();
-        }
-        $list = helper('apex')->perform_filtering($data,$list_terms['rpp'],$list_terms['page'],$select_array,$request,'product',Product::class);
-        return response()->json(
-            [
-                'items'=>$list['items'],
-                'headers'=>$list_terms['headers'],
-                'total'=>$list['total'],
-                'fields'=>$list_terms['fields'],
-                'filterables'=>$list['filterables'],
-                'filtered' => $list['filtered'],
-                'addflag' => $user->can('list_products') ? 1:0, 
-            ]
-        );
-    }
-    public function tally(Request $request)
-    {
-        $user=\Auth::user();
-        $headers=[];
-        $select_array = ['id','name','mrp','general_selling_price'];
-        $list_settings = ProductListSettings::select('value')->where('user_id',$user->id)->first();
-        if($list_settings)
-        {
-            $select_array = explode(",",$list_settings->value);
-            array_push($select_array,'id');
-        }
-        $list_terms = helper('apex')->get_list_terms($request,'product',$select_array,$this->searcheable);
-        if($request->get('search')){
-            $data = Product::where($list_terms['search'])->where([['tally','=',0],['publish','=',1]])->get();
-        }
-        else{
-            $data = Product::where([['tally','=',0],['publish','=',1]])->get();
-        }
-        $list = helper('apex')->perform_filtering($data,$list_terms['rpp'],$list_terms['page'],$select_array,$request,'product',Product::class);
-        return response()->json(
-            [
-                'items'=>$list['items'],
-                'headers'=>$list_terms['headers'],
-                'total'=>$list['total'],
-                'fields'=>$list_terms['fields'],
-                'filterables'=>$list['filterables'],
-                'filtered' => $list['filtered'],
-                'addflag' => $user->can('list_products') ? 1:0, 
             ]
         );
     }

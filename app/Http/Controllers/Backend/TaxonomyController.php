@@ -19,17 +19,14 @@ class TaxonomyController extends Controller
     protected $searcheable =['name'];
 
     public function index(Request $request){
-        $user = \Auth::user();
-        $headers=[];
+        $user=\Auth::user();
         $select_array = ['id','name','type_id','code'];
         $list_terms = helper('apex')->get_list_terms($request,'category',$select_array,$this->searcheable);
+        $data = Category::select($select_array);
         if($request->get('search')){
-            $data = Category::where($list_terms['search'])->get();
+            $data = $data->where($list_terms['search']);
         }
-        else{
-            $data = Category::all();
-        }
-        $list = helper('apex')->perform_filtering($data,$list_terms['rpp'],$list_terms['page'],$select_array,$request,'category',Category::class);
+        $list = helper('apex')->perform_filtering($data,$select_array,$request,'category',Product::class);
         return response()->json(
             [
                 'items'=>$list['items'],
@@ -38,7 +35,7 @@ class TaxonomyController extends Controller
                 'fields'=>'',
                 'filterables'=>$list['filterables'],
                 'filtered' => $list['filtered'],
-                'addflag' => $user->can('create_category') ? 1 : 0,
+                'addflag' => $user->can('create_category') ? 1:0, 
                 'exportflag' => 1,
                 'importflag' => $user->can('create_category') && $user->can('edit_category') ? 1: 0,
             ]

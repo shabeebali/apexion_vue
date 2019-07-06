@@ -93,6 +93,9 @@
                     </template>
                 </v-layout>
             </template>
+            <div class="text-xs-center pt-2">
+                <v-pagination v-model="pagination.page" :length="pages" :total-visible="7"></v-pagination>
+            </div>
             <div class="v-datatable v-table v-datatable--select-all theme--light">
                 <div class="v-datatable__actions">
                     <div class="v-datatable__actions__search ml-4 mb-2" style="flex: 1 1 0;">
@@ -102,6 +105,7 @@
                         label="Search"
                         single-line
                         hide-details
+                        clearable
                         ></v-text-field>
                     </div>
                     <div class="v-datatable__actions__select">
@@ -128,10 +132,10 @@
             :items="tableItems"
             item-key="id"
             select-all
-
             v-model="selected"
             :loading="loading"
             :pagination.sync="pagination"
+            :total-items="totalItems"
             >
                 <template v-slot:items="props">
                     <td>
@@ -192,11 +196,16 @@
                 </template>
                 <template v-slot:footer v-if="deleteManyFlag">
                     <v-layout class="justify-start">
-                        <v-btn @click="deleteMany" color="error" :disabled="selected.length == 0">Delete</v-btn>
-                        <v-btn v-if="extraButton" @click="extraBtnMethod" color="success" :disabled="selected.length == 0">{{extraButtonLabel}}</v-btn>
+                        <v-flex xs12>
+                            <v-btn @click="deleteMany" color="error" :disabled="selected.length == 0">Delete</v-btn>
+                            <v-btn v-if="extraButton" @click="extraBtnMethod" color="success" :disabled="selected.length == 0">{{extraButtonLabel}}</v-btn>
+                        </v-flex>
                     </v-layout>
                 </template>
             </v-data-table>
+            <div class="text-xs-center pt-2">
+                <v-pagination v-model="pagination.page" :length="pages" :total-visible="7"></v-pagination>
+            </div>
             <v-dialog v-model="listSettingsModel" persistent max-width="600px" v-if="listFields">
                 <v-card>
                     <v-card-title>
@@ -340,6 +349,12 @@ export default{
     computed:{
         exportRoute: function(){
             return window.axios.defaults.baseURL+this.baseRoute.substr(0,this.baseRoute.indexOf('?'))+'/export'
+        },
+        pages () {
+            if (this.pagination.rowsPerPage == null || this.totalItems == null){
+               return 0 
+            }
+            return Math.ceil(this.totalItems / this.pagination.rowsPerPage)
         }
     },
     watch: {
@@ -354,6 +369,7 @@ export default{
                 else{
                     this.pageControlText = '-'
                 }
+                this.updateList()
             },
             deep: true
         },
@@ -549,7 +565,7 @@ export default{
         getDataFromApi(search){
             this.loading = true;
             const { sortBy, descending, page, rowsPerPage } = this.pagination
-            return this.getItems(page,rowsPerPage,search).then((data)=>{
+            return this.getItems(page,rowsPerPage,search,sortBy,descending).then((data)=>{
                 let total = data.total;
                 let items = data.items;
                 let headers = data.headers;
@@ -603,20 +619,29 @@ export default{
             })
 
         },
-        getItems(page,rowsPerPage,search){
+        getItems(page,rowsPerPage,search,sortBy,descending){
             var data={
                 'items':[],
                 'headers':[],
             };
             var items = [];
             var headers = [];
+            var rpp = ''
             if(rowsPerPage>0){
-                var rpp='&rpp='+rowsPerPage;
+                rpp='&rpp='+rowsPerPage;
             }
-            else{
-                var rpp = '';
+            var sort = ''
+            if(sortBy){
+                sort = '&sortby='+sortBy
             }
-            return axios.get(this.listRoute+'&page='+page+rpp+'&search='+search).then((response)=>{
+            var desc = ''
+            if(descending){
+                desc = '&descending=1'
+            }
+            if(search == null){
+                search = ''
+            }
+            return axios.get(this.listRoute+'&page='+page+rpp+'&search='+search+sort+desc).then((response)=>{
                 if(response.status == 200){
                     data.items = response.data.items;
                     data.headers = response.data.headers;

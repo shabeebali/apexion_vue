@@ -52,21 +52,16 @@ return [
             'categories'=>[
                 'name'=>'Categories',
                 'type'=>'multiselect',
-                'relation'=>'one2many',
-                'relation_name'=>'category',
+                'relation'=>'many2many',
+                'pivot_table'=>'category_product',
+                'join_from' => 'products.id',
+                'join_to'=> 'category_product.product_id',
+                'relation_id'=>'category_id',
                 'filter_column'=>'id',
                 'class'=>'App\Modules\Taxonomy\Models\Category',
                 'group_class'=>'App\Modules\Taxonomy\Models\CategoryType',
                 'group_relation' => 'type'
             ],
-            
-            'stock'=>[
-                'name'=>'Stock',
-                'type'=>'slider',
-                'relation'=>'one2many',
-                'relation_func'=>'warehouses',
-                'pivot_column'=>'stock',
-            ]
             
         ],
     ],

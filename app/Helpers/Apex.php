@@ -5,11 +5,21 @@ use Konekt\Concord\Facades\Concord;
 use Illuminate\Support\Facades\Cache;
 class Apex
 {
-    public function data_filter($data,$filterables,$request)
+    public function data_filter($data,$request,$module)
     {
+        $modules = Concord::getModules();
+        $filterables=[];
+        foreach($modules as $key => $value){
+            if(config($key.'.filterable.'.$module)){
+                $temp=config($key.'.filterable.'.$module);
+                foreach ($temp as $key => $value) {
+                    $filterables[$key] = $value;
+                }
+            }
+        }
         $filtered = [];
-        foreach ($filterables as $key => $filter)
-        {
+        foreach ($filterables as $key => $filter) {
+            
             if($request->get($key))
             {
                 if($filter['relation'] == 'none')
@@ -38,77 +48,16 @@ class Apex
                         ];
                     }
                 }
-                if($filter['relation'] == 'one2one' || $filter['relation'] == 'many2one')
-                {
-                    if($filter['type'] == 'select')
-                    {
-                        $func_name = substr($key,0,strlen($key)-3);
-                        $data = $data->filter(function($item) use($request,$key,$func_name,$filter){
-                            $it = $item->$func_name()->first();
-                            if($it[$filter['filter_column']] == $request->get($key))
-                            {
-                                return true;
-                            }
-                            return false;
-                        });
-                        $filtered[]=
-                        [
-                            'key' => $key,
-                            'value' => $filter['class']::find($request->get($key))->name,//$request->get($key),
-                            'name' => $filter['name'],
-                            'type' => $filter['type']
-                        ];
-                    }
-                    if($filter['type']=='slider')
-                    {
-                        $limit = explode(",",$request->get($key));
-                        $data = $data->filter(function($item) use($request,$key,$filter,$limit){
-                            $it = $item->$key()->first();
-                            if($it[$filter['filter_column']] >= $limit[0] && $it[$filter['filter_column']] <=$limit[1])
-                            {
-                                return true;
-                            }
-                            return false;
-                        });
-                        $filtered[]=
-                        [
-                            'key' => $key,
-                            'range' => $limit,
-                            'name' => $filter['name'],
-                            'type' => $filter['type']
-                        ];
-                    }
-                }
                 if($filter['relation'] == 'one2many' || $filter['relation'] == 'many2many')
                 {
                     if($filter['type']=='multiselect')
                     {
                         $terms = explode(",",$request->get($key));
                         //dd($terms);
-                        $data = $data->filter(function($item) use($request,$key,$filter,$terms){
-                            if(isset($filter['relation_func'])){
-                                $func_name = $filter['relation_func'];
-                               $its = $item->$func_name(); 
-                            }
-                            else{
-                                $its = $item->$key()->get();
-                            }
-                            //dd($its);
-                            $count=0;       
-                            foreach ($its as $it) {
-                                if(in_array($it[$filter['filter_column']],$terms))
-                                {
-                                    $count = $count+1;
-                                }
-                                
-                            }
-                            if($count == count($terms)){
-                                return true;
-                            }
-                            return false;
-                        });
+                        $data = $data->join($filter['pivot_table'],$filter['join_from'],$filter['join_to']);
                         $term_names=[];
                         foreach ($terms as $id) {
+                            $data->where($filter['relation_id'],$id);
                             $it = $filter['class']::find($id);
                             $temp = [
                                 'name'=>$it->name,
@@ -124,35 +73,10 @@ class Apex
                             'type' => $filter['type']
                         ];
                     }
-                    if($filter['type'] == 'slider')
-                    {
-                        $limit = explode(",",$request->get($key));
-                        $data = $data->filter(function($item) use($request,$key,$filter,$limit){
-                            $related_func = $filter['relation_func'];
-                            $pivot_name = $filter['pivot_column'];
-                            $its = $item->$related_func()->get();
-                            $total = 0;
-                            foreach ($its as $it) {
-                                $total = $total + $it->pivot->$pivot_name;
-                            }
-                            if($total >= $limit[0] && $total <=$limit[1])
-                            {
-                                return true;
-                            }
-                            return false;
-                        });
-                        $filtered[]=
-                        [
-                            'key' => $key,
-                            'range' => $limit,
-                            'name' => $filter['name'],
-                            'type' => $filter['type']
-                        ];
-                    }
                 }
             }
         }
-        return ['data'=>$data,'filtered'=>$filtered];
+        return ['data'=>$data,'filtered'=>$filtered,'filterables'=>$filterables];
     }
     public function get_filterables($module,$class){
         $modules = Concord::getModules();
@@ -219,41 +143,6 @@ class Apex
                     $filterable[$key]['options'] = $temp;
                     $filterable[$key]['value'] = '';
                 }
-                if($arr['type'] == 'slider')
-                {
-                    $related_func = $arr['relation_func'];
-                    $pivot_name = $arr['pivot_column'];
-                    $objs = $class::select('id')->get();
-                    $val_array = [];
-                    if(Cache::has($module.'_'.$pivot_name.'_max') && Cache::has($module.'_'.$pivot_name.'_min'))
-                    {
-                        $max_val = Cache::get($module.'_'.$pivot_name.'_max');
-                        $min_val = Cache::get($module.'_'.$pivot_name.'_min');
-                    }
-                    else
-                    {
-                        foreach ($objs as $obj){
-                            $its = $obj->$related_func()->get();
-                            $temp = 0;
-                            foreach ($its as $it) {
-                                $temp = $temp + $it->pivot->$pivot_name; 
-                            }
-                            $val_array[] = $temp;
-                        }
-                        if(count($val_array) == 0){
-                            $val_array = [0];
-                        }
-                        $max_val = max($val_array);
-                        $min_val = min($val_array);
-                        Cache::put($module.'_'.$pivot_name.'_max',$max_val);
-                        Cache::put($module.'_'.$pivot_name.'_min',$min_val);
-                    }
-                    
-                    $filterable[$key]['max_value'] = ceil($max_val);
-                    $filterable[$key]['min_value'] = floor($min_val);
-                    $filterable[$key]['range'] = [floor($min_val), ceil($max_val)];
-                    $filterable[$key]['default'] = [floor($min_val), ceil($max_val)];
-                }
             }
         }
         return $filterable;
@@ -284,72 +173,34 @@ class Apex
 
         });
         foreach ($select_array as $s) {
+            $s = explode(".",$s);
+            //dd($s);
+            $s = count($s) > 1? $s[1]:$s[0];
             if($s != 'id'){
                 $headers[] = ['text'=>$fields[$s]['text'],'value'=>$s];
             }
         }
         $headers[]=['text'=>'Actions','value'=>'actions','align'=>'right'];
         $page = 1;
-        if($request->get('page')){
-            $page = $request->get('page');
-        }
-        $rpp = NULL;
-        if($request->get('rpp')){
-            $rpp = $request->get('rpp');
-        }
         foreach ($searcheable as $value) {
             $search[]=[$value,'like','%'.$request->get('search').'%'];
         }
         return [
             'search' => $search,
-            'page' => $page,
-            'rpp' => $rpp,
             'headers'=>$headers,
             'fields' => $fields,
         ];
     }
-    public function perform_filtering($data,$rpp,$page,$select_array,$request,$entity,$class){
-        $filterables = $this->get_filterables($entity,$class);
-        $data_filter = $this->data_filter($data,$filterables,$request);
+    public function perform_filtering($data,$select_array,$request,$entity,$class){
+        $data_filter = $this->data_filter($data,$request,$entity);
         $data = $data_filter['data'];
         $filtered = $data_filter['filtered'];
-        $total = $data->count();
-        /*if($rpp)
+        $filterables = $data_filter['filterables'];
+        if($request->sortby)
         {
-            $data = $data->slice(($page-1)*$rpp,$rpp);
+            $data = $data->orderBy($request->sortby,$request->descending?'desc':'asc');
         }
-        */
-        //dd($data);
-        $data = $data->map(
-            function ($dat) use ($select_array,$filterables)
-            {
-                $arr = $dat->toArray();
-                $new_arr =[];
-                foreach ($select_array as $select_term) {
-                    if(array_key_exists($select_term,$filterables) && $filterables[$select_term]['relation'] == 'many2one')
-                    {
-                        $func_name = substr($select_term,0,strlen($select_term)-3);
-                        $new_arr[$select_term] = $dat->$func_name()->first()->name;
-                    }
-                    elseif (array_key_exists($select_term,$filterables) && $filterables[$select_term]['relation'] == 'one2many') {
-                        $related_func = $filterables[$select_term]['relation_func'];
-                        $pivot_name = $filterables[$select_term]['pivot_column'];
-                        $its = $dat->$related_func()->get();
-                        $total = 0;
-                        foreach ($its as $it) {
-                            $total = $total+ $it->pivot->$pivot_name;
-                        }
-                        $new_arr[$select_term] = $total;
-                    }
-                    else
-                    {
-                        $new_arr[$select_term] = ($arr[$select_term]?$arr[$select_term]:'-');
-                    }
-                }
-                return collect($new_arr)->all();
-            }
-        );
-        $items = [];
+        $data = $data->paginate($request->rpp);
         $user = \Auth::user();
         $delete_flag = 0;
         if($user->can('delete_'.$entity)){
@@ -359,18 +210,37 @@ class Apex
         if($user->can('edit_'.$entity)){
             $edit_flag = 1;
         }
-        foreach ($data as $dat) {
-            $dat['actions'] = [
-                'actions'=>1,
-                'edit'=>$edit_flag,
-                'delete'=>$delete_flag,
-                'id' => $dat['id'],
-            ];
-            $items[] = $dat;
-        }
+        $total = $data->toArray()['total'];
+        $data = $data->map(
+            function ($dat) use ($select_array,$filterables,$edit_flag,$delete_flag)
+            {
+                $arr = $dat->toArray();
+                $new_arr =[];
+                foreach ($select_array as $select_term) {
+                    $select_term = explode(".",$select_term);
+                    $select_term = count($select_term) > 1? $select_term[1]:$select_term[0];
+                    if(array_key_exists($select_term,$filterables) && $filterables[$select_term]['relation'] == 'many2one')
+                    {
+                        $func_name = substr($select_term,0,strlen($select_term)-3);
+                        $new_arr[$select_term] = $dat->$func_name()->first()->name;
+                    }
+                    else
+                    {
+                        $new_arr[$select_term] = ($arr[$select_term]?$arr[$select_term]:'-');
+                    }
+                }
+                $new_arr['actions'] = [
+                    'actions'=>1,
+                    'edit'=>$edit_flag,
+                    'delete'=>$delete_flag,
+                    'id' => $dat['id'],
+                ];
+                return collect($new_arr)->all();
+            }
+        );
         return [
             'total'=>$total,
-            'items' => $items,
+            'items' => $data,
             'filterables'=> $filterables,
             'filtered' => $filtered,
         ];
