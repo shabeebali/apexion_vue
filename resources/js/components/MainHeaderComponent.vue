@@ -89,12 +89,20 @@
         },
         methods:{
             logout:function(){
+                axios.post('http://apexiondental.com/erp/logout').then(
+                    function(response){
+                        localStorage.removeItem('token');
+                        window.location = 'hhttp://apexiondental.com/erp';
+                    }
+                )
+                /*
                 axios.post('http://localhost:8000/logout').then(
                     function(response){
                         localStorage.removeItem('token');
                         window.location = 'http://localhost:8000';
                     }
                 )
+                */
             },
             profile(){
 
