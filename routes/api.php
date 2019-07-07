@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return response()->json(['username'=>$request->user()->name]);
 });
-Route::middleware('auth:api')->group(function(){
+Route::middleware(['auth:api'])->group(function(){
     Route::get('/config/menu','Backend\ConfigController@menuRender');
     Route::get('/validate_token',function(){
         return 'validated';
