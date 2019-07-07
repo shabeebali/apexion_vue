@@ -89,9 +89,8 @@
         },
         methods:{
             logout:function(){
-                loc = window.location.href;
-                axios.post(loc.substr(0,loc.indexOf('.com'))+'.com/erp/logout').then(
-                    function(response){
+                var loc = window.location.href;
+                axios.post(loc.substr(0,loc.indexOf('.com'))+'.com/erp/logout').then((response)=>{
                         localStorage.removeItem('token');
                         window.location = loc.substr(0,loc.indexOf('.com'))+'.com/erp';
                     }
