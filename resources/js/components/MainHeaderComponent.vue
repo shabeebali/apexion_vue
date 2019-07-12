@@ -89,20 +89,22 @@
         },
         methods:{
             logout:function(){
-                var loc = window.location.href;
-                axios.post(loc.substr(0,loc.indexOf('.com'))+'.com/erp/logout').then((response)=>{
+              /*
+                axios.post('http://www.apexiondental.com/erp/logout').then(
+                    function(response){
                         localStorage.removeItem('token');
-                        window.location = loc.substr(0,loc.indexOf('.com'))+'.com/erp';
+                        window.location = 'http://www.apexiondental.com/erp';
                     }
                 )
-                /*
+                */
+                
                 axios.post('http://localhost:8000/logout').then(
                     function(response){
                         localStorage.removeItem('token');
                         window.location = 'http://localhost:8000';
                     }
                 )
-                */
+                
             },
             profile(){
 

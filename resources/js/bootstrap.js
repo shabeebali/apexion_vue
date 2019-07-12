@@ -23,9 +23,8 @@ try {
 window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-var loc = window.location.href;
-window.axios.defaults.baseURL = loc.substr(0,loc.indexOf('.com'))+'.com/erp/api'; 
-//window.axios.defaults.baseURL = 'http://localhost:8000/api'; 
+window.axios.defaults.baseURL = 'http://localhost:8000/api'; // http://apexiondental.com/erp/api
+//window.axios.defaults.baseURL = 'http://www.apexiondental.com/erp/api'; // http://apexiondental.com/erp/api
 /**
  * Next we will register the CSRF Token as a common header with Axios so that
  * all outgoing HTTP requests automatically have it attached. This is just
