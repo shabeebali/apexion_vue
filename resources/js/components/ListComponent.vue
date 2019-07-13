@@ -136,7 +136,7 @@
             :loading="loading"
             :pagination.sync="pagination"
             :total-items="totalItems"
-            rows-per-page-items="rowsPerPageItems"
+            :rows-per-page-items="rowsPerPageItems"
             >
                 <template v-slot:items="props">
                     <td>
