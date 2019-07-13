@@ -1,5 +1,5 @@
 <template>
-	<div class="teal" style="height: 100%; background-image: url('svg/apexion_logo.svg');background-size: cover; background-position-y: center;">
+	<div class="teal" style="height: 100%; background-image: url('../svg/apexion_logo.svg');background-size: cover; background-position-y: center;">
 		<v-layout row wrap class="pt-5">
 			<v-flex xs12 md4 px-2>
 			</v-flex>
