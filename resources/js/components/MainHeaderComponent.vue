@@ -76,9 +76,10 @@
               //main_menu_items : '',
               menuBackground:'url("'+this.$asset+'/svg/apexion_logo.svg")',
               username : '',
+              main_menu_items:[],
             }
         },
-        props:['main_menu_items'],
+        props:[],
         created:function(){
 
         },
@@ -86,25 +87,28 @@
           axios.get('/user').then((response)=>{
             this.username = response.data.username
           })
+          axios.get('/config/menu').then((response)=>{
+              if(response.data){
+                  this.main_menu_items = response.data
+              }
+          })
         },
         methods:{
             logout:function(){
-              
-                axios.post('http://www.apexiondental.com/erp/logout').then(
+              /*
+                axios.get('http://www.apexiondental.com/erp/admin/logout').then(
                     function(response){
                         localStorage.removeItem('token');
-                        window.location = 'http://www.apexiondental.com/erp';
+                        this.$router.push('/login')
                     }
                 )
+              */  
+              axios.post('logout').then((response)=>{
+                      localStorage.removeItem('token');
+                      this.$router.push('/login')
+                  }
+              )
                 
-                /*
-                axios.post('http://localhost:8000/logout').then(
-                    function(response){
-                        localStorage.removeItem('token');
-                        window.location = 'http://localhost:8000';
-                    }
-                )
-                */
             },
             profile(){
 

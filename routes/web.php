@@ -18,16 +18,18 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
-
-Route::middleware('auth')->group(function(){
-    Route::prefix('/admin')->group(function(){
-        Route::get('/{any}',function(){
-            return view('backend.app');
-        })->where('any', '.*');
-        Route::get('/',function(){
-            return view('backend.app');
-        });
+Route::prefix('/admin')->group(function(){
+    Route::get('/{any}',function(){
+        return view('backend.app');
+    })->where('any', '.*');
+    Route::get('/',function(){
+        return view('backend.app');
     });
-    Route::get('/generate_token','Auth\ApexionController@generate_token');
 });
 Route::get('/test','Backend\ProductController@temp');
+Route::middleware('auth')->group(function(){
+    Route::get('test2',function(){
+        $user=\Auth::user();
+        return 'Permitted for '.$user->name;
+    });
+});

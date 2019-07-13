@@ -30,15 +30,17 @@ window.axios.defaults.baseURL = 'http://www.apexiondental.com/erp/api'; // http:
  * all outgoing HTTP requests automatically have it attached. This is just
  * a simple convenience so we don't have to attach every token manually.
  */
+
 window.axios.interceptors.response.use((response)=> {
     return response;
 },(error)=> {
     if (401 === error.response.status) {
-        window.location.replace(window.axios.defaults.baseURL.substr(0,window.axios.defaults.baseURL.length-3)+'login')
+        window.location.replace(window.axios.defaults.baseURL.substr(0,window.axios.defaults.baseURL.length-3)+'admin/login')
     } else {
         return Promise.reject(error);
     }
 });
+
 let token = document.head.querySelector('meta[name="csrf-token"]');
 
 if (token) {

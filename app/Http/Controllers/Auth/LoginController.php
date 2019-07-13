@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Validator;
 use Illuminate\Support\Str;
 
 class LoginController extends Controller
@@ -42,6 +43,36 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+    public function login(Request $request){
+        //dd($request);
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message'=>'failed',
+                'errors'=>$validator->errors(),
+            ]);
+        }
+        if($this->guard()->attempt($this->credentials($request)))
+        {
+            $user = \Auth::user();
+            $token = hash('sha256',$user->id);
+            $user->forceFill([
+                'api_token' => $token,
+            ])->save();
+            return response()->json([
+                'message'=>'success',
+                'token' => $token
+            ]);
+        }
+        return response()->json([
+            'errors'=>[
+                'password'=>'Wrong credentials'
+            ]
+        ]);
+    }
     protected function authenticated(Request $request, $user)
     {
 
@@ -50,14 +81,11 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         $user = \Auth::user();
-        $token = Str::random(60);
-        $user->api_token = hash('sha256', $token);
-        $user->save();
-        $this->guard()->logout();
-
-        $request->session()->invalidate();
-
-        return $this->loggedOut($request) ?: redirect('/login');
+        //$user->api_token = hash('sha256', 'olakka');
+        //$user->save();
+        //$request->session()->invalidate();
+        return response()->json(['message'=>'success']);
+        //return $this->loggedOut($request) ?: redirect('/login');
         //return redirect('/login');
     }
     public function loggedOut(Request $request)

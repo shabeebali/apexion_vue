@@ -41,6 +41,16 @@ const app = new Vue({
     },
     created(){
         this.$vuetify.theme.primary = colors.teal.darken1
+        var localToken = localStorage.token;
+        if (localToken === undefined){
+          this.$router.push('/login')
+        }
+        else{
+          window.axios.defaults.headers.common['Authorization'] = 'Bearer '+ localToken
+        }
+    },
+    mounted(){
+      
     },
     methods:{
       

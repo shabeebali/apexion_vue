@@ -1,3 +1,4 @@
+import Login from '../views/backend/auth/LoginComponent.vue'
 import SettingsIndex from '../views/backend/settings/IndexComponent.vue'
 import SettingsUsersList from '../views/backend/settings/UsersListComponent.vue'
 import SettingsUsersIndex from '../views/backend/settings/UsersIndexComponent.vue'
@@ -34,6 +35,11 @@ export const routes=[
         path:'/',
         name:'Dashboard',
         component:DashboardIndex,
+    },
+    {
+        path:'/login',
+        name:'Login',
+        component:Login
     },
     {
         path:'/settings',

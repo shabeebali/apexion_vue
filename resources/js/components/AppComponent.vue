@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <main-header v-bind:main_menu_items="main_menu_items" v-on:sidebar-toggle="sidebarToggle = !sidebarToggle"></main-header>
+    <div style="height:100%">
+        <main-header v-if="this.$router.currentRoute.name !== 'Login'" v-on:sidebar-toggle="sidebarToggle = !sidebarToggle"></main-header>
         <router-view :sidebarToggle="sidebarToggle"></router-view>
     </div>
 </template>
@@ -10,7 +10,6 @@ export default{
     data:function(){
         return{
             //token:'',
-            main_menu_items:'',
             sidebarToggle:0,
         }
     },
@@ -18,6 +17,7 @@ export default{
         'main-header': MainHeader,
     },
     created:function(){
+        /*
         var thisObj = this;
         if(typeof localStorage.token !== "undefined"){
             var token = localStorage.token;
@@ -38,16 +38,9 @@ export default{
                 this.getMainMenu();
             })
         }
+        */
     },
     methods:{
-        getMainMenu:function(){
-            axios.get('/config/menu').then((response)=>{
-                if(response.data){
-                    this.main_menu_items = response.data
-                }
-            })
-            return true;
-        },
     }
 }
 </script>
