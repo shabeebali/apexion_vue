@@ -136,6 +136,7 @@
             :loading="loading"
             :pagination.sync="pagination"
             :total-items="totalItems"
+            rows-per-page-items="rowsPerPageItems"
             >
                 <template v-slot:items="props">
                     <td>
@@ -289,18 +290,19 @@ export default{
             loadingDialog:false,
             exportFlag:false,
             importFlag:false,
+            rowsPerPageItems:[15,25,50,100],
             rowsPerPageSelectItems:[
                 {
-                    'text':'5',
-                    'value':5
-                },
-                {
-                    'text':'10',
-                    'value':10
+                    'text':'15',
+                    'value':15
                 },
                 {
                     'text':'25',
                     'value':25
+                },
+                {
+                    'text':'50',
+                    'value':50
                 },
                 {
                     'text':'100',
