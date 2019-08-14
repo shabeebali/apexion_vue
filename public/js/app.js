@@ -94398,9 +94398,8 @@ Vue.use(vuetify__WEBPACK_IMPORTED_MODULE_0___default.a);
 Vue.use(vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]);
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
   routes: _router_js__WEBPACK_IMPORTED_MODULE_3__["routes"],
-  base: '/admin',
-  // /erp/admin
-  //base:'/erp/admin',
+  //base:'/admin', // /erp/admin
+  base: '/erp/admin',
   mode: 'history'
 }); //Vue.prototype.$asset = '/' // /erp/
 
@@ -94474,9 +94473,9 @@ try {
  */
 
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.baseURL = 'http://localhost:8000/api'; // http://apexiondental.com/erp/api
-//window.axios.defaults.baseURL = 'http://www.apexiondental.com/erp/api'; // http://apexiondental.com/erp/api
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'; //window.axios.defaults.baseURL = 'http://localhost:8000/api'; // http://apexiondental.com/erp/api
+
+window.axios.defaults.baseURL = 'http://apexiondental.com/erp/api'; // http://apexiondental.com/erp/api
 
 /**
  * Next we will register the CSRF Token as a common header with Axios so that
