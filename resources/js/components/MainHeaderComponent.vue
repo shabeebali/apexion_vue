@@ -5,7 +5,7 @@
         <v-btn icon @click.stop="main_menu_dialog = true" title="Apps Menu">
           <v-icon>apps</v-icon> 
         </v-btn>
-        <img src="/erp/images/apexion_logo.svg"/>
+        <img src="/images/apexion_logo.svg"/>
         <v-spacer></v-spacer>
         Welcome {{username}}
         <v-menu offset-y>
