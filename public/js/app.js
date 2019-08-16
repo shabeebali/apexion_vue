@@ -94294,7 +94294,7 @@ try {
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 var base_url = document.head.querySelector('meta[name="base-url"]');
-window.axios.defaults.baseURL = base_url + '/api';
+window.axios.defaults.baseURL = base_url.content + '/api';
 /**
  * Next we will register the CSRF Token as a common header with Axios so that
  * all outgoing HTTP requests automatically have it attached. This is just
