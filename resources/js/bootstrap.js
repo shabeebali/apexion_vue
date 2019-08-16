@@ -30,7 +30,7 @@ window.axios.defaults.baseURL = base_url.content+'/api';
  * all outgoing HTTP requests automatically have it attached. This is just
  * a simple convenience so we don't have to attach every token manually.
  */
-
+/*
 window.axios.interceptors.response.use((response)=> {
     return response;
 },(error)=> {
@@ -40,7 +40,7 @@ window.axios.interceptors.response.use((response)=> {
         return Promise.reject(error);
     }
 });
-
+*/
 let token = document.head.querySelector('meta[name="csrf-token"]');
 
 if (token) {

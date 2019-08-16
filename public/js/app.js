@@ -94301,15 +94301,18 @@ window.axios.defaults.baseURL = base_url.content + '/api';
  * a simple convenience so we don't have to attach every token manually.
  */
 
-window.axios.interceptors.response.use(function (response) {
-  return response;
-}, function (error) {
-  if (401 === error.response.status) {
-    window.location.replace(window.axios.defaults.baseURL.substr(0, window.axios.defaults.baseURL.length - 3) + 'admin/login');
-  } else {
-    return Promise.reject(error);
-  }
+/*
+window.axios.interceptors.response.use((response)=> {
+    return response;
+},(error)=> {
+    if (401 === error.response.status) {
+        window.location.replace(window.axios.defaults.baseURL.substr(0,window.axios.defaults.baseURL.length-3)+'admin/login')
+    } else {
+        return Promise.reject(error);
+    }
 });
+*/
+
 var token = document.head.querySelector('meta[name="csrf-token"]');
 
 if (token) {
