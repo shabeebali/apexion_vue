@@ -61,11 +61,6 @@
                 								</div>
                 							</div>
                 						</v-card-text>
-                						<v-card-actions>
-                                            <v-btn icon dark to="products/list">
-                                                <v-icon>arrow_forward</v-icon>
-                                            </v-btn>
-                                        </v-card-actions>
                 					</v-card>
                                 </v-flex>
                                 <v-flex xs12>
@@ -88,11 +83,6 @@
                                                 </div>
                                             </div>
                                         </v-card-text>
-                                        <v-card-actions>
-                                            <v-btn icon dark to="customers/list">
-                                                <v-icon>arrow_forward</v-icon>
-                                            </v-btn>
-                                        </v-card-actions>
                                     </v-card>
                                 </v-flex>
                             </v-layout>

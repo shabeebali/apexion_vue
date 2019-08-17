@@ -3639,16 +3639,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -5064,6 +5054,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -5136,6 +5136,12 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _js_components_ListComponent_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../js/components/ListComponent.vue */ "./resources/js/components/ListComponent.vue");
+/* harmony import */ var vue_spinner_src_PulseLoader_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-spinner/src/PulseLoader.vue */ "./node_modules/vue-spinner/src/PulseLoader.vue");
+//
+//
+//
+//
+//
 //
 //
 //
@@ -5160,12 +5166,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
-    'list-component': _js_components_ListComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+    'list-component': _js_components_ListComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    'pulse-loader': vue_spinner_src_PulseLoader_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data: function data() {
     return {
+      loader: true,
       baseRoute: '/products?pending=1&',
       listSettingsRoute: '/products/list_settings',
       filterables: [],
@@ -5191,9 +5200,11 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
+    this.loader = true;
     axios.get('/products/filterables').then(function (response) {
       if (response.status == 200) {
         _this.filterables = response.data.filterables;
+        _this.loader = false;
       } else {
         alert('Something went wrong!!!');
         console.log(response);
@@ -5616,6 +5627,12 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _js_components_ListComponent_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../js/components/ListComponent.vue */ "./resources/js/components/ListComponent.vue");
+/* harmony import */ var vue_spinner_src_PulseLoader_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-spinner/src/PulseLoader.vue */ "./node_modules/vue-spinner/src/PulseLoader.vue");
+//
+//
+//
+//
+//
 //
 //
 //
@@ -5642,12 +5659,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
-    'list-component': _js_components_ListComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+    'list-component': _js_components_ListComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    'pulse-loader': vue_spinner_src_PulseLoader_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data: function data() {
     return {
+      loader: true,
       baseRoute: '/products?tally=1&',
       listSettingsRoute: '/products/list_settings',
       filterables: [],
@@ -5673,9 +5693,11 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
+    this.loader = true;
     axios.get('/products/filterables').then(function (response) {
       if (response.status == 200) {
         _this.filterables = response.data.filterables;
+        _this.loader = false;
       } else {
         alert('Something went wrong!!!');
         console.log(response);
@@ -7347,6 +7369,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _js_components_ListComponent_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../js/components/ListComponent.vue */ "./resources/js/components/ListComponent.vue");
 /* harmony import */ var _CategoriesAddComponent_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CategoriesAddComponent.vue */ "./resources/views/backend/taxonomy/CategoriesAddComponent.vue");
 /* harmony import */ var _CategoriesEditComponent_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CategoriesEditComponent.vue */ "./resources/views/backend/taxonomy/CategoriesEditComponent.vue");
+/* harmony import */ var vue_spinner_src_PulseLoader_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-spinner/src/PulseLoader.vue */ "./node_modules/vue-spinner/src/PulseLoader.vue");
 //
 //
 //
@@ -7372,6 +7395,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+
 
 
 
@@ -7379,10 +7409,12 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     'list-component': _js_components_ListComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
     'add-component': _CategoriesAddComponent_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    'edit-component': _CategoriesEditComponent_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+    'edit-component': _CategoriesEditComponent_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+    'pulse-loader': vue_spinner_src_PulseLoader_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   data: function data() {
     return {
+      loader: true,
       baseRoute: '/products/categories?',
       listSettingsRoute: '/products/list_settings',
       filterables: [],
@@ -7409,9 +7441,11 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
+    this.loader = true;
     axios.get('/products/categories/filterables').then(function (response) {
       if (response.status == 200) {
         _this.filterables = response.data.filterables;
+        _this.loader = false;
       } else {
         alert('Something went wrong!!!');
         console.log(response);
@@ -42768,30 +42802,7 @@ var render = function() {
                                             1
                                           )
                                         ])
-                                      ]),
-                                      _vm._v(" "),
-                                      _c(
-                                        "v-card-actions",
-                                        [
-                                          _c(
-                                            "v-btn",
-                                            {
-                                              attrs: {
-                                                icon: "",
-                                                dark: "",
-                                                to: "products/list"
-                                              }
-                                            },
-                                            [
-                                              _c("v-icon", [
-                                                _vm._v("arrow_forward")
-                                              ])
-                                            ],
-                                            1
-                                          )
-                                        ],
-                                        1
-                                      )
+                                      ])
                                     ],
                                     1
                                   )
@@ -42871,30 +42882,7 @@ var render = function() {
                                               )
                                             ])
                                           : _vm._e()
-                                      ]),
-                                      _vm._v(" "),
-                                      _c(
-                                        "v-card-actions",
-                                        [
-                                          _c(
-                                            "v-btn",
-                                            {
-                                              attrs: {
-                                                icon: "",
-                                                dark: "",
-                                                to: "customers/list"
-                                              }
-                                            },
-                                            [
-                                              _c("v-icon", [
-                                                _vm._v("arrow_forward")
-                                              ])
-                                            ],
-                                            1
-                                          )
-                                        ],
-                                        1
-                                      )
+                                      ])
                                     ],
                                     1
                                   )
@@ -45511,12 +45499,23 @@ var render = function() {
                                                 ],
                                                 1
                                               ),
-                                              _vm._v(
-                                                " Products Pending Approval:"
+                                              _vm._v(" "),
+                                              _c(
+                                                "router-link",
+                                                {
+                                                  staticClass: "white--text",
+                                                  attrs: { to: "pending" }
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    "\n                                            Products Pending Approval: \n                                        "
+                                                  )
+                                                ]
                                               )
                                             ],
                                             1
                                           ),
+                                          _vm._v(" "),
                                           _c(
                                             "v-chip",
                                             { attrs: { color: "amber" } },
@@ -45525,30 +45524,7 @@ var render = function() {
                                         ],
                                         1
                                       )
-                                    ]),
-                                    _vm._v(" "),
-                                    _c(
-                                      "v-card-actions",
-                                      [
-                                        _c(
-                                          "v-btn",
-                                          {
-                                            attrs: {
-                                              icon: "",
-                                              dark: "",
-                                              to: "pending"
-                                            }
-                                          },
-                                          [
-                                            _c("v-icon", [
-                                              _vm._v("arrow_forward")
-                                            ])
-                                          ],
-                                          1
-                                        )
-                                      ],
-                                      1
-                                    )
+                                    ])
                                   ],
                                   1
                                 )
@@ -45597,10 +45573,23 @@ var render = function() {
                                                 [_c("v-icon", [_vm._v("T")])],
                                                 1
                                               ),
-                                              _vm._v("To be synced with Tally:")
+                                              _vm._v(" "),
+                                              _c(
+                                                "router-link",
+                                                {
+                                                  staticClass: "white--text",
+                                                  attrs: { to: "tally" }
+                                                },
+                                                [
+                                                  _vm._v(
+                                                    "\n                                            To be synced with Tally:\n                                        "
+                                                  )
+                                                ]
+                                              )
                                             ],
                                             1
                                           ),
+                                          _vm._v(" "),
                                           _c(
                                             "v-chip",
                                             { attrs: { color: "amber" } },
@@ -45609,30 +45598,7 @@ var render = function() {
                                         ],
                                         1
                                       )
-                                    ]),
-                                    _vm._v(" "),
-                                    _c(
-                                      "v-card-actions",
-                                      [
-                                        _c(
-                                          "v-btn",
-                                          {
-                                            attrs: {
-                                              icon: "",
-                                              dark: "",
-                                              to: "tally"
-                                            }
-                                          },
-                                          [
-                                            _c("v-icon", [
-                                              _vm._v("arrow_forward")
-                                            ])
-                                          ],
-                                          1
-                                        )
-                                      ],
-                                      1
-                                    )
+                                    ])
                                   ],
                                   1
                                 )
@@ -45712,30 +45678,45 @@ var render = function() {
             1
           ),
           _vm._v(" "),
-          _c(
-            "v-container",
-            { staticClass: "pt-0", attrs: { fluid: "" } },
-            [
-              _c("list-component", {
-                attrs: {
-                  listHeadline: "Pending Products",
-                  listClass: "products-list",
-                  baseRoute: _vm.baseRoute,
-                  filterables: _vm.filterables,
-                  listSettingsRoute: _vm.listSettingsRoute,
-                  triggerUpdate: _vm.triggerUpdate
-                },
-                on: {
-                  "triggered-update": function($event) {
-                    _vm.triggerUpdate = false
-                  },
-                  "open-add-dialog": _vm.redirectAdd,
-                  "open-edit-dialog": _vm.editItem
-                }
-              })
-            ],
-            1
-          )
+          _c("v-container", { staticClass: "pt-0", attrs: { fluid: "" } }, [
+            _vm.loader
+              ? _c(
+                  "div",
+                  [
+                    _c("pulse-loader", {
+                      staticStyle: {
+                        top: "50%",
+                        left: "50%",
+                        position: "absolute"
+                      }
+                    })
+                  ],
+                  1
+                )
+              : _c(
+                  "div",
+                  [
+                    _c("list-component", {
+                      attrs: {
+                        listHeadline: "Pending Products",
+                        listClass: "products-list",
+                        baseRoute: _vm.baseRoute,
+                        filterables: _vm.filterables,
+                        listSettingsRoute: _vm.listSettingsRoute,
+                        triggerUpdate: _vm.triggerUpdate
+                      },
+                      on: {
+                        "triggered-update": function($event) {
+                          _vm.triggerUpdate = false
+                        },
+                        "open-add-dialog": _vm.redirectAdd,
+                        "open-edit-dialog": _vm.editItem
+                      }
+                    })
+                  ],
+                  1
+                )
+          ])
         ],
         1
       )
@@ -46538,33 +46519,48 @@ var render = function() {
             1
           ),
           _vm._v(" "),
-          _c(
-            "v-container",
-            { staticClass: "pt-0", attrs: { fluid: "" } },
-            [
-              _c("list-component", {
-                attrs: {
-                  listHeadline: "Products to be synced with Tally",
-                  listClass: "products-list",
-                  baseRoute: _vm.baseRoute,
-                  filterables: _vm.filterables,
-                  listSettingsRoute: _vm.listSettingsRoute,
-                  triggerUpdate: _vm.triggerUpdate,
-                  extraButton: "",
-                  extraButtonLabel: "Tally Sync",
-                  extraButtonRoute: "tally_sync"
-                },
-                on: {
-                  "triggered-update": function($event) {
-                    _vm.triggerUpdate = false
-                  },
-                  "open-add-dialog": _vm.redirectAdd,
-                  "open-edit-dialog": _vm.editItem
-                }
-              })
-            ],
-            1
-          )
+          _c("v-container", { staticClass: "pt-0", attrs: { fluid: "" } }, [
+            _vm.loader
+              ? _c(
+                  "div",
+                  [
+                    _c("pulse-loader", {
+                      staticStyle: {
+                        top: "50%",
+                        left: "50%",
+                        position: "absolute"
+                      }
+                    })
+                  ],
+                  1
+                )
+              : _c(
+                  "div",
+                  [
+                    _c("list-component", {
+                      attrs: {
+                        listHeadline: "Products to be synced with Tally",
+                        listClass: "products-list",
+                        baseRoute: _vm.baseRoute,
+                        filterables: _vm.filterables,
+                        listSettingsRoute: _vm.listSettingsRoute,
+                        triggerUpdate: _vm.triggerUpdate,
+                        extraButton: "",
+                        extraButtonLabel: "Tally Sync",
+                        extraButtonRoute: "tally_sync"
+                      },
+                      on: {
+                        "triggered-update": function($event) {
+                          _vm.triggerUpdate = false
+                        },
+                        "open-add-dialog": _vm.redirectAdd,
+                        "open-edit-dialog": _vm.editItem
+                      }
+                    })
+                  ],
+                  1
+                )
+          ])
         ],
         1
       )
@@ -49108,56 +49104,71 @@ var render = function() {
             1
           ),
           _vm._v(" "),
-          _c(
-            "v-container",
-            { staticClass: "pt-0", attrs: { fluid: "" } },
-            [
-              _c("list-component", {
-                attrs: {
-                  listHeadline: "Categories",
-                  listClass: "categories-list",
-                  baseRoute: _vm.baseRoute,
-                  filterables: _vm.filterables,
-                  listSettingsRoute: _vm.listSettingsRoute,
-                  triggerUpdate: _vm.triggerUpdate,
-                  importable: "",
-                  exportable: ""
-                },
-                on: {
-                  "triggered-update": function($event) {
-                    _vm.triggerUpdate = false
-                  },
-                  "open-add-dialog": function($event) {
-                    _vm.addDialog = true
-                  },
-                  "open-edit-dialog": _vm.editItem,
-                  "delete-item": _vm.deleteItem
-                }
-              }),
-              _vm._v(" "),
-              _c("add-component", {
-                attrs: { dialog: _vm.addDialog },
-                on: {
-                  "close-add-dialog": function($event) {
-                    _vm.triggerUpdate = true
-                    _vm.addDialog = false
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _c("edit-component", {
-                attrs: { id: _vm.editId, dialog: _vm.editDialog },
-                on: {
-                  "close-edit-dialog": function($event) {
-                    _vm.triggerUpdate = true
-                    _vm.editDialog = false
-                    _vm.editId = 0
-                  }
-                }
-              })
-            ],
-            1
-          )
+          _c("v-container", { staticClass: "pt-0", attrs: { fluid: "" } }, [
+            _vm.loader
+              ? _c(
+                  "div",
+                  [
+                    _c("pulse-loader", {
+                      staticStyle: {
+                        top: "50%",
+                        left: "50%",
+                        position: "absolute"
+                      }
+                    })
+                  ],
+                  1
+                )
+              : _c(
+                  "div",
+                  [
+                    _c("list-component", {
+                      attrs: {
+                        listHeadline: "Categories",
+                        listClass: "categories-list",
+                        baseRoute: _vm.baseRoute,
+                        filterables: _vm.filterables,
+                        listSettingsRoute: _vm.listSettingsRoute,
+                        triggerUpdate: _vm.triggerUpdate,
+                        importable: "",
+                        exportable: ""
+                      },
+                      on: {
+                        "triggered-update": function($event) {
+                          _vm.triggerUpdate = false
+                        },
+                        "open-add-dialog": function($event) {
+                          _vm.addDialog = true
+                        },
+                        "open-edit-dialog": _vm.editItem,
+                        "delete-item": _vm.deleteItem
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("add-component", {
+                      attrs: { dialog: _vm.addDialog },
+                      on: {
+                        "close-add-dialog": function($event) {
+                          _vm.triggerUpdate = true
+                          _vm.addDialog = false
+                        }
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("edit-component", {
+                      attrs: { id: _vm.editId, dialog: _vm.editDialog },
+                      on: {
+                        "close-edit-dialog": function($event) {
+                          _vm.triggerUpdate = true
+                          _vm.editDialog = false
+                          _vm.editId = 0
+                        }
+                      }
+                    })
+                  ],
+                  1
+                )
+          ])
         ],
         1
       )

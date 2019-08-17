@@ -13,25 +13,35 @@
                         <v-flex  md4 sm6 xs12 pa-2 v-if="pending_count > 0">
                             <v-card color="blue-grey darken-4 white--text" class="pa-2">
                                 <v-card-text class="pa-0">
-                                    <div class="ma-0"><v-chip dark color="blue-grey darken-3"><v-avatar><v-icon>hourglass_empty</v-icon></v-avatar> Products Pending Approval:</v-chip><v-chip color="amber">{{pending_count}}</v-chip></div>
+                                    <div class="ma-0">
+                                        <v-chip dark color="blue-grey darken-3">
+                                            <v-avatar>
+                                                <v-icon>hourglass_empty</v-icon>
+                                            </v-avatar> 
+                                            <router-link to="pending" class="white--text">
+                                                Products Pending Approval: 
+                                            </router-link>
+                                        </v-chip>
+                                        <v-chip color="amber">{{pending_count}}</v-chip>
+                                    </div>
                                 </v-card-text>
-                                <v-card-actions>
-                                    <v-btn icon dark to="pending">
-                                        <v-icon>arrow_forward</v-icon>
-                                    </v-btn>
-                                </v-card-actions>
                             </v-card>
                         </v-flex>
                         <v-flex  md4 sm6 xs12 pa-2 v-if="tally_count > 0">
                             <v-card color="blue-grey darken-3 white--text" class="pa-2">
                                 <v-card-text class="pa-0">
-                                    <div class="ma-0"><v-chip dark color="blue-grey darken-4"><v-avatar><v-icon>T</v-icon></v-avatar>To be synced with Tally:</v-chip><v-chip color="amber">{{tally_count}}</v-chip></div>
+                                    <div class="ma-0">
+                                        <v-chip dark color="blue-grey darken-4">
+                                            <v-avatar>
+                                                <v-icon>T</v-icon>
+                                            </v-avatar>
+                                            <router-link to="tally" class="white--text">
+                                                To be synced with Tally:
+                                            </router-link>
+                                        </v-chip>
+                                        <v-chip color="amber">{{tally_count}}</v-chip>
+                                    </div>
                                 </v-card-text>
-                                <v-card-actions>
-                                    <v-btn icon dark to="tally">
-                                        <v-icon>arrow_forward</v-icon>
-                                    </v-btn>
-                                </v-card-actions>
                             </v-card>
                         </v-flex>
                     </v-layout>
