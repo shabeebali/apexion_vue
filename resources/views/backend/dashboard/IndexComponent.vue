@@ -6,64 +6,58 @@
             </div>
             <v-container fluid class="pt-0">
             	<v-card class="pa-4">
-            		<v-layout row wrap>
-            			<v-flex sm6 xs12 pr-2 mb-2>
-                            <v-layout row wrap>
-                                <v-flex xs12 mb-2>
+            		<v-row row wrap>
+            			<v-col sm=6 cols=12 class="pr-2 mb-2">
+                            <v-row row wrap>
+                                <v-col cols=12 mb-2>
                     				<v-card color="blue-grey darken-4 white--text" class="pa-2">
                     					<v-card-title>
                     						Products
                     					</v-card-title>
                     					<v-card-text>
-                    						<div v-if="pending_count > 0">
-                    							<div class="ma-0">
-                    								<v-chip dark color="blue-grey darken-3" >
-                    									<v-avatar>
-                    										<v-icon>hourglass_empty</v-icon>
-                    									</v-avatar>
-                    									<router-link to="inventory/products/pending" class="white--text">
-                    										Products Pending Approval:
-                    									</router-link>
-                    								</v-chip>
-                									<v-chip color="amber">
-                										{{pending_count}}
-                									</v-chip>
-                								</div>
-                							</div>
-            								<div v-if="tally_count > 0">
-                								<div class="ma-0">
-                									<v-chip dark color="blue-grey darken-3">
-                										<v-avatar>
-                											<v-icon>T</v-icon>
-                										</v-avatar>
-                										<router-link to="inventory/products/tally" class="white--text">
-                											To be synced with Tally:
-                										</router-link>
-                									</v-chip>
-                									<v-chip color="amber">
-                										{{tally_count}}
-                									</v-chip>
-                								</div>
-                							</div>
-                							<div>
-                								<div class="ma-0">
-                									<v-chip dark color="blue-grey darken-3" >
-                										<v-avatar>
-                											<v-icon>list_alt</v-icon>
-                										</v-avatar>
-                										<router-link to="inventory/products" class="white--text">
-                											Total Active Products
-                										</router-link>
-                									</v-chip>
-                									<v-chip color="amber">
-                										{{products_count}}
-                									</v-chip>
-                								</div>
-                							</div>
+                							<div class="mb-2" v-if="pending_count > 0">
+                								<v-chip dark color="blue-grey darken-3" >
+                									<v-avatar>
+                										<v-icon>hourglass_empty</v-icon>
+                									</v-avatar>
+                									<router-link to="inventory/products/pending" class="white--text">
+                										Products Pending Approval:
+                									</router-link>
+                								</v-chip>
+            									<v-chip color="amber">
+            										{{pending_count}}
+            									</v-chip>
+            								</div>
+            								<div class="mb-2" v-if="tally_count > 0">
+            									<v-chip dark color="blue-grey darken-3">
+            										<v-avatar>
+            											<v-icon>T</v-icon>
+            										</v-avatar>
+            										<router-link to="inventory/products/tally" class="white--text">
+            											To be synced with Tally:
+            										</router-link>
+            									</v-chip>
+            									<v-chip color="amber">
+            										{{tally_count}}
+            									</v-chip>
+            								</div>
+            								<div class="ma-0">
+            									<v-chip dark color="blue-grey darken-3" >
+            										<v-avatar>
+            											<v-icon>list_alt</v-icon>
+            										</v-avatar>
+            										<router-link to="inventory/products" class="white--text">
+            											Total Active Products
+            										</router-link>
+            									</v-chip>
+            									<v-chip color="amber">
+            										{{products_count}}
+            									</v-chip>
+            								</div>
                 						</v-card-text>
                 					</v-card>
-                                </v-flex>
-                                <v-flex xs12>
+                                </v-col>
+                                <v-col cols=12>
                                     <v-card color="blue-grey darken-4 white--text" class="pa-2">
                                         <v-card-title>
                                             Customers
@@ -84,12 +78,12 @@
                                             </div>
                                         </v-card-text>
                                     </v-card>
-                                </v-flex>
-                            </v-layout>
-        				</v-flex>
-        				<v-flex sm6 xs12 pr-2 mb-2>
-        					<v-layout row wrap>
-        						<v-flex xs12 mb-2>
+                                </v-col>
+                            </v-row>
+        				</v-col>
+        				<v-col sm=6 cols=12 class="pr-2 mb-2">
+        					<v-row row wrap>
+        						<v-col cols=12 mb-2>
                                     <v-card color="blue-grey darken-3 white--text" class="pa-2">
                                         <v-card-title>
                                             Notifications
@@ -101,8 +95,8 @@
                                             <v-btn>View All</v-btn>
                                         </v-card-actions>
                                     </v-card>
-                                </v-flex>
-		        				<v-flex xs12>
+                                </v-col>
+		        				<v-col cols=12>
 		        					<v-card color="blue-grey darken-3 white--text" class="pa-2">
 		            					<v-card-title>
 		            						Messages
@@ -114,10 +108,10 @@
 		        							<v-btn>View All</v-btn>
 		        						</v-card-actions>
 		        					</v-card>
-		        				</v-flex>
-		        			</v-layout>
-        				</v-flex>
-        				<v-flex xs12 >
+		        				</v-col>
+		        			</v-row>
+        				</v-col>
+        				<v-col cols=12 >
             				<v-card class="mx-auto text-xs-center"
 							    color="primary"
 							    dark
@@ -133,14 +127,14 @@
 										height="100"
 										padding="24"
 										stroke-linecap="round"
-										smooth
+										sm=ooth
 										>
 								        </v-sparkline>
 								    </v-sheet>
         						</v-card-text>
         					</v-card>
-        				</v-flex>
-        			</v-layout>
+        				</v-col>
+        			</v-row>
             	</v-card>
             </v-container>
         </v-content>    

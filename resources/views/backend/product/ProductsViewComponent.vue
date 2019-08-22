@@ -49,7 +49,7 @@
                     {
                         text:'Products',
                         disabled:false,
-                        to:'/products',
+                        to:'/inventory/products',
                         exact:true,
                     },
                     {

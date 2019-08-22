@@ -161,7 +161,7 @@ class ProductController extends Controller
             $v = $obj->pricelists()->where('pricelist_id',$pricelist->id)->first();
             $temp[] = [
                 'key'=>$pricelist->name.' Margin',
-                'value'=>$v->pivot->value
+                'value'=>$v->pivot->value.' %'
             ];
             $temp[] = [
                 'key'=>$pricelist->name.' Price',
@@ -499,9 +499,13 @@ class ProductController extends Controller
 
         $warehouses = Warehouse::all();
         $arr=[];
+        $total_stock = 0;
         foreach ($warehouses as $wh) {
             $arr[$wh->id] = ['stock'=>$request->get('warehouse_'.$wh->slug) ? $request->get('warehouse_'.$wh->slug):0];
+            $total_stock =  $total_stock + ($request->get('warehouse_'.$wh->slug) ? $request->get('warehouse_'.$wh->slug):0);
         }
+        $obj->stock = $total_stock;
+        $obj->save();
         $obj->warehouses()->sync($arr);
         return response()->json([
             'message'=>'success'

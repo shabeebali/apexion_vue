@@ -3537,12 +3537,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -5694,7 +5688,7 @@ __webpack_require__.r(__webpack_exports__);
       }, {
         text: 'Products',
         disabled: false,
-        to: '/products',
+        to: '/inventory/products',
         exact: true
       }, {
         text: 'view',
@@ -42284,22 +42278,23 @@ var render = function() {
                 { staticClass: "pa-4" },
                 [
                   _c(
-                    "v-layout",
+                    "v-row",
                     { attrs: { row: "", wrap: "" } },
                     [
                       _c(
-                        "v-flex",
+                        "v-col",
                         {
-                          attrs: { sm6: "", xs12: "", "pr-2": "", "mb-2": "" }
+                          staticClass: "pr-2 mb-2",
+                          attrs: { sm: "6", cols: "12" }
                         },
                         [
                           _c(
-                            "v-layout",
+                            "v-row",
                             { attrs: { row: "", wrap: "" } },
                             [
                               _c(
-                                "v-flex",
-                                { attrs: { xs12: "", "mb-2": "" } },
+                                "v-col",
+                                { attrs: { cols: "12", "mb-2": "" } },
                                 [
                                   _c(
                                     "v-card",
@@ -42318,201 +42313,188 @@ var render = function() {
                                       _vm._v(" "),
                                       _c("v-card-text", [
                                         _vm.pending_count > 0
-                                          ? _c("div", [
-                                              _c(
-                                                "div",
-                                                { staticClass: "ma-0" },
-                                                [
-                                                  _c(
-                                                    "v-chip",
-                                                    {
-                                                      attrs: {
-                                                        dark: "",
-                                                        color:
-                                                          "blue-grey darken-3"
-                                                      }
-                                                    },
-                                                    [
-                                                      _c(
-                                                        "v-avatar",
-                                                        [
-                                                          _c("v-icon", [
-                                                            _vm._v(
-                                                              "hourglass_empty"
-                                                            )
-                                                          ])
-                                                        ],
-                                                        1
-                                                      ),
-                                                      _vm._v(" "),
-                                                      _c(
-                                                        "router-link",
-                                                        {
-                                                          staticClass:
-                                                            "white--text",
-                                                          attrs: {
-                                                            to:
-                                                              "inventory/products/pending"
-                                                          }
-                                                        },
-                                                        [
+                                          ? _c(
+                                              "div",
+                                              { staticClass: "mb-2" },
+                                              [
+                                                _c(
+                                                  "v-chip",
+                                                  {
+                                                    attrs: {
+                                                      dark: "",
+                                                      color:
+                                                        "blue-grey darken-3"
+                                                    }
+                                                  },
+                                                  [
+                                                    _c(
+                                                      "v-avatar",
+                                                      [
+                                                        _c("v-icon", [
                                                           _vm._v(
-                                                            "\n                    \t\t\t\t\t\t\t\t\t\tProducts Pending Approval:\n                    \t\t\t\t\t\t\t\t\t"
+                                                            "hourglass_empty"
                                                           )
-                                                        ]
-                                                      )
-                                                    ],
-                                                    1
-                                                  ),
-                                                  _vm._v(" "),
-                                                  _c(
-                                                    "v-chip",
-                                                    {
-                                                      attrs: { color: "amber" }
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        "\n                \t\t\t\t\t\t\t\t\t\t" +
-                                                          _vm._s(
-                                                            _vm.pending_count
-                                                          ) +
-                                                          "\n                \t\t\t\t\t\t\t\t\t"
-                                                      )
-                                                    ]
-                                                  )
-                                                ],
-                                                1
-                                              )
-                                            ])
+                                                        ])
+                                                      ],
+                                                      1
+                                                    ),
+                                                    _vm._v(" "),
+                                                    _c(
+                                                      "router-link",
+                                                      {
+                                                        staticClass:
+                                                          "white--text",
+                                                        attrs: {
+                                                          to:
+                                                            "inventory/products/pending"
+                                                        }
+                                                      },
+                                                      [
+                                                        _vm._v(
+                                                          "\n                \t\t\t\t\t\t\t\t\t\tProducts Pending Approval:\n                \t\t\t\t\t\t\t\t\t"
+                                                        )
+                                                      ]
+                                                    )
+                                                  ],
+                                                  1
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "v-chip",
+                                                  { attrs: { color: "amber" } },
+                                                  [
+                                                    _vm._v(
+                                                      "\n            \t\t\t\t\t\t\t\t\t\t" +
+                                                        _vm._s(
+                                                          _vm.pending_count
+                                                        ) +
+                                                        "\n            \t\t\t\t\t\t\t\t\t"
+                                                    )
+                                                  ]
+                                                )
+                                              ],
+                                              1
+                                            )
                                           : _vm._e(),
                                         _vm._v(" "),
                                         _vm.tally_count > 0
-                                          ? _c("div", [
-                                              _c(
-                                                "div",
-                                                { staticClass: "ma-0" },
-                                                [
-                                                  _c(
-                                                    "v-chip",
-                                                    {
-                                                      attrs: {
-                                                        dark: "",
-                                                        color:
-                                                          "blue-grey darken-3"
-                                                      }
-                                                    },
-                                                    [
-                                                      _c(
-                                                        "v-avatar",
-                                                        [
-                                                          _c("v-icon", [
-                                                            _vm._v("T")
-                                                          ])
-                                                        ],
-                                                        1
-                                                      ),
-                                                      _vm._v(" "),
-                                                      _c(
-                                                        "router-link",
-                                                        {
-                                                          staticClass:
-                                                            "white--text",
-                                                          attrs: {
-                                                            to:
-                                                              "inventory/products/tally"
-                                                          }
-                                                        },
-                                                        [
-                                                          _vm._v(
-                                                            "\n                \t\t\t\t\t\t\t\t\t\t\tTo be synced with Tally:\n                \t\t\t\t\t\t\t\t\t\t"
-                                                          )
-                                                        ]
-                                                      )
-                                                    ],
-                                                    1
-                                                  ),
-                                                  _vm._v(" "),
-                                                  _c(
-                                                    "v-chip",
-                                                    {
-                                                      attrs: { color: "amber" }
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        "\n                \t\t\t\t\t\t\t\t\t\t" +
-                                                          _vm._s(
-                                                            _vm.tally_count
-                                                          ) +
-                                                          "\n                \t\t\t\t\t\t\t\t\t"
-                                                      )
-                                                    ]
-                                                  )
-                                                ],
-                                                1
-                                              )
-                                            ])
+                                          ? _c(
+                                              "div",
+                                              { staticClass: "mb-2" },
+                                              [
+                                                _c(
+                                                  "v-chip",
+                                                  {
+                                                    attrs: {
+                                                      dark: "",
+                                                      color:
+                                                        "blue-grey darken-3"
+                                                    }
+                                                  },
+                                                  [
+                                                    _c(
+                                                      "v-avatar",
+                                                      [
+                                                        _c("v-icon", [
+                                                          _vm._v("T")
+                                                        ])
+                                                      ],
+                                                      1
+                                                    ),
+                                                    _vm._v(" "),
+                                                    _c(
+                                                      "router-link",
+                                                      {
+                                                        staticClass:
+                                                          "white--text",
+                                                        attrs: {
+                                                          to:
+                                                            "inventory/products/tally"
+                                                        }
+                                                      },
+                                                      [
+                                                        _vm._v(
+                                                          "\n            \t\t\t\t\t\t\t\t\t\t\tTo be synced with Tally:\n            \t\t\t\t\t\t\t\t\t\t"
+                                                        )
+                                                      ]
+                                                    )
+                                                  ],
+                                                  1
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "v-chip",
+                                                  { attrs: { color: "amber" } },
+                                                  [
+                                                    _vm._v(
+                                                      "\n            \t\t\t\t\t\t\t\t\t\t" +
+                                                        _vm._s(
+                                                          _vm.tally_count
+                                                        ) +
+                                                        "\n            \t\t\t\t\t\t\t\t\t"
+                                                    )
+                                                  ]
+                                                )
+                                              ],
+                                              1
+                                            )
                                           : _vm._e(),
                                         _vm._v(" "),
-                                        _c("div", [
-                                          _c(
-                                            "div",
-                                            { staticClass: "ma-0" },
-                                            [
-                                              _c(
-                                                "v-chip",
-                                                {
-                                                  attrs: {
-                                                    dark: "",
-                                                    color: "blue-grey darken-3"
-                                                  }
-                                                },
-                                                [
-                                                  _c(
-                                                    "v-avatar",
-                                                    [
-                                                      _c("v-icon", [
-                                                        _vm._v("list_alt")
-                                                      ])
-                                                    ],
-                                                    1
-                                                  ),
-                                                  _vm._v(" "),
-                                                  _c(
-                                                    "router-link",
-                                                    {
-                                                      staticClass:
-                                                        "white--text",
-                                                      attrs: {
-                                                        to: "inventory/products"
-                                                      }
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        "\n                \t\t\t\t\t\t\t\t\t\t\tTotal Active Products\n                \t\t\t\t\t\t\t\t\t\t"
-                                                      )
-                                                    ]
-                                                  )
-                                                ],
-                                                1
-                                              ),
-                                              _vm._v(" "),
-                                              _c(
-                                                "v-chip",
-                                                { attrs: { color: "amber" } },
-                                                [
-                                                  _vm._v(
-                                                    "\n                \t\t\t\t\t\t\t\t\t\t" +
-                                                      _vm._s(
-                                                        _vm.products_count
-                                                      ) +
-                                                      "\n                \t\t\t\t\t\t\t\t\t"
-                                                  )
-                                                ]
-                                              )
-                                            ],
-                                            1
-                                          )
-                                        ])
+                                        _c(
+                                          "div",
+                                          { staticClass: "ma-0" },
+                                          [
+                                            _c(
+                                              "v-chip",
+                                              {
+                                                attrs: {
+                                                  dark: "",
+                                                  color: "blue-grey darken-3"
+                                                }
+                                              },
+                                              [
+                                                _c(
+                                                  "v-avatar",
+                                                  [
+                                                    _c("v-icon", [
+                                                      _vm._v("list_alt")
+                                                    ])
+                                                  ],
+                                                  1
+                                                ),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "router-link",
+                                                  {
+                                                    staticClass: "white--text",
+                                                    attrs: {
+                                                      to: "inventory/products"
+                                                    }
+                                                  },
+                                                  [
+                                                    _vm._v(
+                                                      "\n            \t\t\t\t\t\t\t\t\t\t\tTotal Active Products\n            \t\t\t\t\t\t\t\t\t\t"
+                                                    )
+                                                  ]
+                                                )
+                                              ],
+                                              1
+                                            ),
+                                            _vm._v(" "),
+                                            _c(
+                                              "v-chip",
+                                              { attrs: { color: "amber" } },
+                                              [
+                                                _vm._v(
+                                                  "\n            \t\t\t\t\t\t\t\t\t\t" +
+                                                    _vm._s(_vm.products_count) +
+                                                    "\n            \t\t\t\t\t\t\t\t\t"
+                                                )
+                                              ]
+                                            )
+                                          ],
+                                          1
+                                        )
                                       ])
                                     ],
                                     1
@@ -42522,8 +42504,8 @@ var render = function() {
                               ),
                               _vm._v(" "),
                               _c(
-                                "v-flex",
-                                { attrs: { xs12: "" } },
+                                "v-col",
+                                { attrs: { cols: "12" } },
                                 [
                                   _c(
                                     "v-card",
@@ -42608,18 +42590,19 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
+                        "v-col",
                         {
-                          attrs: { sm6: "", xs12: "", "pr-2": "", "mb-2": "" }
+                          staticClass: "pr-2 mb-2",
+                          attrs: { sm: "6", cols: "12" }
                         },
                         [
                           _c(
-                            "v-layout",
+                            "v-row",
                             { attrs: { row: "", wrap: "" } },
                             [
                               _c(
-                                "v-flex",
-                                { attrs: { xs12: "", "mb-2": "" } },
+                                "v-col",
+                                { attrs: { cols: "12", "mb-2": "" } },
                                 [
                                   _c(
                                     "v-card",
@@ -42655,8 +42638,8 @@ var render = function() {
                               ),
                               _vm._v(" "),
                               _c(
-                                "v-flex",
-                                { attrs: { xs12: "" } },
+                                "v-col",
+                                { attrs: { cols: "12" } },
                                 [
                                   _c(
                                     "v-card",
@@ -42698,8 +42681,8 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "v-flex",
-                        { attrs: { xs12: "" } },
+                        "v-col",
+                        { attrs: { cols: "12" } },
                         [
                           _c(
                             "v-card",
@@ -42728,7 +42711,7 @@ var render = function() {
                                           height: "100",
                                           padding: "24",
                                           "stroke-linecap": "round",
-                                          smooth: ""
+                                          sm: "ooth"
                                         }
                                       })
                                     ],
