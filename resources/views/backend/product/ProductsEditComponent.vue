@@ -84,7 +84,7 @@
                             <v-row row wrap>
                                 <v-col lg=6 md=6 cols=12>
                                     <v-row column wrap>
-                                        <v-col px-2 v-for="(item,i) in pc_category_types" :key="i">
+                                        <v-col cols=12 v-for="(item,i) in pc_category_types" :key="i">
                                             <v-combobox :label="item.label" v-model="item.value" :items="item.options" :error-messages="item.error"></v-combobox>
                                         </v-col>
                                     </v-row>
