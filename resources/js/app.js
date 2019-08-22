@@ -11,8 +11,8 @@ const router = new VueRouter({
   base:'/admin',
   mode:'history',
 });
-Vue.prototype.$asset = '/' // /erp/
-//Vue.prototype.$asset = '/erp/'
+//Vue.prototype.$asset = '/' // /erp/
+Vue.prototype.$asset = '/erp/'
 Vue.mixin({
   methods: {
     confirmDialog(msg) {
@@ -36,14 +36,8 @@ const app = new Vue({
         'app-component':AppComponent,
     },
     created(){
-<<<<<<< Updated upstream
         
         var localToken = localStorage.token;
-=======
-        this.$vuetify.theme.primary = colors.teal.darken1
-        var localToken = localStorage.access_token;
-        console.log(localToken)
->>>>>>> Stashed changes
         if (localToken === undefined){
           this.$router.push('/login')
         }

@@ -7,7 +7,6 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Validator;
 use Illuminate\Support\Str;
-use GuzzleHttp\Client;
 
 class LoginController extends Controller
 {
@@ -56,7 +55,6 @@ class LoginController extends Controller
                 'errors'=>$validator->errors(),
             ]);
         }
-        /*
         if($this->guard()->attempt($this->credentials($request)))
         {
             $user = \Auth::user();
@@ -73,26 +71,7 @@ class LoginController extends Controller
             'errors'=>[
                 'password'=>'Wrong credentials'
             ]
-        ]);*/
-        $http = new Client([
-            'base_uri' => config('app.url'),
-            'defaults' => [
-                'exceptions' => false
-            ]
         ]);
-
-        $response = $http->post('erp/oauth/token', [
-            'form_params' => [
-                'grant_type' => 'password',
-                'client_id' => '2',
-                'client_secret' => 'thZERIGFZZCNhBa5ruNBOjOX9rtnltMFlA5UtQJv',
-                'username' => $request->email,
-                'password' => $request->password,
-                'scope' => '*',
-            ],
-        ]);
-        return json_decode((string) $response->getBody(), true);
-
     }
     protected function authenticated(Request $request, $user)
     {
@@ -102,7 +81,6 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         $user = \Auth::user();
-        $user->token()->revoke();
         //$user->api_token = hash('sha256', 'olakka');
         //$user->save();
         //$request->session()->invalidate();

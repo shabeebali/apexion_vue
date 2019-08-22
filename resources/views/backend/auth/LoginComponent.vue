@@ -56,14 +56,14 @@
 				fD.append('email',this.formdata.email.value)
 				fD.append('password',this.formdata.password.value)
 				axios.post('login',fD).then((response)=>{
-					if(response.status == 200){
-						localStorage.setItem('access_token', response.data.access_token);
-						localStorage.setItem('refresh_token', response.data.refresh_token);
-						window.axios.defaults.headers.common['Authorization'] = 'Bearer '+ response.data.access_token
+					if(response.data.message == 'success'){
+						localStorage.setItem('token', response.data.token);
+						window.axios.defaults.headers.common['Authorization'] = 'Bearer '+ response.data.token
 						this.$router.push('/')
 					}
 					else{
 						Object.keys(response.data.errors).forEach((key)=>{
+							console.log(key)
                             this.formdata[key]['error'] = response.data.errors[key]
                         })
 					}

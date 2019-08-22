@@ -3,14 +3,13 @@
 namespace App;
 
 use Illuminate\Notifications\Notifiable;
-use Laravel\Passport\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Konekt\Acl\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasRoles;
-    use HasApiTokens, Notifiable;
+    use Notifiable;
     protected $guard_name = 'api';
     /**
      * The attributes that are mass assignable.
