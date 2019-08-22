@@ -55,12 +55,13 @@
                     {
                         text:'Products',
                         disabled:false,
-                        to:'/products/list'
+                        to:'/inventory/products',
+                        exact:true,
                     },
                     {
                         text:'Tally Sync',
                         disabled:true,
-                        to:'/products/tally'
+                        to:'/inventory/products/tally'
                     },  
                 ]
             }
@@ -81,10 +82,10 @@
         },
         methods:{
             editItem($event){
-                this.$router.push('edit/'+$event)
+                this.$router.push('/inventory/products/edit/'+$event+'/tally')
             },
             redirectAdd(){
-                this.$router.push('add')
+                this.$router.push('/inventory/products/add/tally')
             }
         }
     }

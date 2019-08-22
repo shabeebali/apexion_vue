@@ -1,8 +1,8 @@
 <?php
 return [
     'menu' => [
-        'route' => '/products/list',
-        'name' => 'Products',
+        'route' => '/inventory/products/',
+        'name' => 'Inventory',
         'icon' => 'list_alt',
         'permission' => 'list_products'
     ],

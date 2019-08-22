@@ -4,17 +4,16 @@
             <v-breadcrumbs :items="breadcrumbs" divider=">"></v-breadcrumbs>
         </div>
         <v-container fluid class="pt-0">
-            <v-toolbar color="white" tabs>
+            <v-toolbar color="white" light tabs>
                 <v-toolbar-title>Edit Product: {{formdata.name.value}}</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="update">Update</v-btn>
+                <v-btn tile color="primary" @click="update">Update</v-btn>
                 <template v-slot:extension>
-                    <v-tabs v-model="tab" color="white" grow >
-                        <v-tabs-slider color="yellow"></v-tabs-slider>
+                    <v-tabs v-model="tab" color="primary" grow slider-color="yellow" background-color="transparent">
                         <v-tab v-for="(head,key) in tabHeads" :key="key">
                             <v-badge right v-if="head.error" color="white">
                                 <template v-slot:badge>
-                                    <v-icon color="red" small>error</v-icon>
+                                    <v-icon color="red" sm=all>error</v-icon>
                                 </template>
                                 <span>{{ key }}</span>
                             </v-badge>
@@ -27,104 +26,104 @@
                 <v-tabs-items v-model="tab">
                     <v-tab-item>
                         <v-card class="pa-4" flat>
-                            <v-layout row wrap>
-                                <v-flex xs12 px-2>
+                            <v-row row wrap>
+                                <v-col cols=12 px-2>
                                     <v-text-field label="Name" v-model="formdata.name.value" :error-messages="formdata.name.error"></v-text-field>
-                                </v-flex>
-                            </v-layout>
-                            <v-layout row wrap>
-                                <v-flex lg3 md6 xs12 px-2>
+                                </v-col>
+                            </v-row>
+                            <v-row row wrap>
+                                <v-col lg=3 md=6 cols=12 px-2>
                                     <v-text-field label="HSN Code" v-model="formdata.hsn.value" type="text"></v-text-field>
-                                </v-flex>
-                                <v-flex lg3 md6 xs12 px-2>
+                                </v-col>
+                                <v-col lg=3 md=6 cols=12 px-2>
                                     <v-text-field label="Weight" v-model="formdata.weight.value" type="text" :error-messages="formdata.weight.error"></v-text-field>
-                                </v-flex>
-                                <v-flex lg3 md6 xs12 px-2>
+                                </v-col>
+                                <v-col lg=3 md=6 cols=12 px-2>
                                     <v-select label="GST" :items="formdata.gst.options" v-model="formdata.gst.value" ></v-select>
-                                </v-flex>
-                                <v-flex lg3 md6 xs12 px-2>
+                                </v-col>
+                                <v-col lg=3 md=6 cols=12 px-2>
                                         <v-text-field label="MRP" v-model="formdata.mrp.value" type="text" :error-messages="formdata.mrp.error"></v-text-field>
-                                </v-flex>
-                                <v-flex lg3 md6 xs12 px-2>
+                                </v-col>
+                                <v-col lg=3 md=6 cols=12 px-2>
                                     <v-text-field label="Landing Price" v-model="formdata.landing_price.value" type="text" :error-messages="formdata.landing_price.error"></v-text-field>
-                                </v-flex>
-                                <v-flex lg3 md6 xs12 px-2>
+                                </v-col>
+                                <v-col lg=3 md=6 cols=12 px-2>
                                     <v-text-field label="General Selling Price" v-model="formdata.general_selling_price.value" type="text" :error-messages="formdata.general_selling_price.error"></v-text-field>
-                                </v-flex>
-                                <v-flex lg3 md6 xs12 px-2>
+                                </v-col>
+                                <v-col lg=3 md=6 cols=12 px-2>
                                     <v-text-field label="General Selling Price (Dealer)" v-model="formdata.general_selling_dealer.value" type="text" :error-messages="formdata.general_selling_dealer.error"></v-text-field>
-                                </v-flex>
-                                <v-flex lg3 md6 xs12 px-2 v-for="(item,i)  in npc_category_types" :key="i">
+                                </v-col>
+                                <v-col lg=3 md=6 cols=12 px-2 v-for="(item,i)  in npc_category_types" :key="i">
                                     <v-select :label="item.label" :items="item.options" v-model="item.value" :error-messages="item.error"></v-select>
-                                </v-flex>
-                            </v-layout>
-                            <v-layout row wrap>
-                                <v-flex xs12 px-2>
+                                </v-col>
+                            </v-row>
+                            <v-row row wrap>
+                                <v-col cols=12 px-2>
                                     <v-textarea label="Remarks" v-model="formdata.remarks.value"></v-textarea>
-                                </v-flex>
-                            </v-layout>
-                            <v-layout row wrap>
-                                <v-flex xs12 px-2>
+                                </v-col>
+                            </v-row>
+                            <v-row row wrap>
+                                <v-col cols=12 px-2>
                                     <v-textarea label="Description" v-model="formdata.description.value"></v-textarea>
-                                </v-flex>
-                            </v-layout>
-                            <v-layout row wrap v-if="pendingFlag">
-                                <v-flex xs12 px-2>
+                                </v-col>
+                            </v-row>
+                            <v-row row wrap v-if="pendingFlag">
+                                <v-col cols=12 px-2>
                                     <v-switch v-model="formdata.pending.value" true-value="1" false-value="0" label="Approved?"></v-switch>
-                                </v-flex>
-                            </v-layout>
-                            <v-layout row wrap v-if="tallFlag">
-                                <v-flex xs12 px-2>
+                                </v-col>
+                            </v-row>
+                            <v-row row wrap v-if="tallFlag">
+                                <v-col cols=12 px-2>
                                     <v-switch v-model="formdata.tally.value" true-value="1" false-value="0" label="Synced with Tally?"></v-switch>
-                                </v-flex>
-                            </v-layout>
+                                </v-col>
+                            </v-row>
                         </v-card>
                     </v-tab-item>
                     <v-tab-item >
                         <v-card class="pa-4" flat>
-                            <v-layout row wrap>
-                                <v-flex lg6 md6 xs12>
-                                    <v-layout column wrap>
-                                        <v-flex px-2 v-for="(item,i) in pc_category_types" :key="i">
+                            <v-row row wrap>
+                                <v-col lg=6 md=6 cols=12>
+                                    <v-row column wrap>
+                                        <v-col px-2 v-for="(item,i) in pc_category_types" :key="i">
                                             <v-combobox :label="item.label" v-model="item.value" :items="item.options" :error-messages="item.error"></v-combobox>
-                                        </v-flex>
-                                    </v-layout>
-                                </v-flex>
+                                        </v-col>
+                                    </v-row>
+                                </v-col>
 
-                            </v-layout>
+                            </v-row>
                         </v-card>
                     </v-tab-item>
                     <v-tab-item >
                         <v-card class="pa-4" flat v-if="Object.keys(pricelist).length > 0">
-                            <v-layout row wrap v-for="(p,index) in pricelist" :key="index">
-                                <v-flex lg3 md4 sm4 xs6 px-2>
+                            <v-row row wrap v-for="(p,index) in pricelist" :key="index">
+                                <v-col lg=3 md=4 sm=4 cols=6 px-2>
                                     <v-text-field :label="p.name+' price margin (%)'" v-model="pricelist[index].value" 
                                     @input="updatePricelist(index)"></v-text-field>
-                                </v-flex>
-                                <v-flex lg3 md4 sm4 xs6 px-2>
+                                </v-col>
+                                <v-col lg=3 md=4 sm=4 cols=6 px-2>
                                     <v-text-field label="price" 
                                     :value="calculated_price(pricelist[index].value)"
                                     readonly 
                                     :error-messages="p.error"></v-text-field>
-                                </v-flex>
-                            </v-layout>
+                                </v-col>
+                            </v-row>
                         </v-card>
                     </v-tab-item>
                     <v-tab-item >
                         <v-card class="pa-4" flat v-if="Object.keys(warehouse).length > 0">
-                            <v-layout row wrap v-for="(p,index) in warehouse" :key="index">
-                                <v-flex lg3 md4 sm4 xs6 px-2>
+                            <v-row row wrap v-for="(p,index) in warehouse" :key="index">
+                                <v-col lg=3 md=4 sm=4 cols=6 px-2>
                                     <v-text-field :label="'Warehouse: '+p.name" :error-messages="p.error" v-model="warehouse[index].value"></v-text-field>
-                                </v-flex>
-                            </v-layout>
+                                </v-col>
+                            </v-row>
                         </v-card>
                     </v-tab-item>
                 </v-tabs-items>
-                <v-layout px-3>
-                    <v-flex xs12 class="text-xs-right">
-                        <v-btn color="primary" @click="update">Update</v-btn>
-                    </v-flex>
-                </v-layout>
+                <v-row class="mx-0" justify="end">
+                    <v-col md="auto" class="text-xs-right">
+                        <v-btn tile color="primary" @click="update">Update</v-btn>
+                    </v-col>
+                </v-row>
             </v-card>
             <v-dialog v-model="loadingDialog" hide-overlay persistent width="300">
               <v-card color="teal" dark>
@@ -220,7 +219,7 @@ export default{
                     'error':false
                 }
             },
-            text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+            text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusm=od tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
             breadcrumbs:[
                     {
                         text:'Home',
@@ -230,12 +229,13 @@ export default{
                     {
                         text:'Products',
                         disabled:false,
-                        to:'/products/list'
+                        to:'/inventory/products',
+                        exact:true,
                     },
                     {
                         text:'Edit',
                         disabled:true,
-                        to:'/products/edit'
+                        to:'/inventory/products/edit'
                     },  
                 ]
         }
@@ -299,7 +299,6 @@ export default{
     },  
     methods:{
         update(){
-            console.log(this.pricelist)
             this.loadingDialog=true
             var fD = new FormData()
             Object.keys(this.formdata).forEach((key)=>{
@@ -326,7 +325,9 @@ export default{
 
                 if(response.status == 200 && response.data.message == 'success'){
                     this.loadingDialog = false,
-                    this.$router.push('/products/list')
+                    this.$router.push('/inventory/products/'+(this.$route.params.redirect ? this.$route.params.redirect: ''),()=>{
+                        this.$emit('snackbar','Product Updated Succesfully','success')
+                    })
                 }
                 else if(response.status == 200 && response.data.message == 'failed'){
                     this.clearError()

@@ -7,34 +7,26 @@
             <v-toolbar color="white" tabs>
                 <v-toolbar-title>Product: {{data.name}}t</v-toolbar-title>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" :to="'/products/edit/'+$route.params.id">Edit</v-btn>
+                <v-btn color="primary" :to="'/inventory/products/edit/'+$route.params.id">Edit</v-btn>
             </v-toolbar>
-            <v-card>
-                <v-data-iterator :items="data.items" content-tag="v-layout" hide-actions>
-                    <template v-slot:item="props">
-                        <v-flex xs12 md6 pa-2>
-                            <v-card>
-                                <v-card-title class="subheading font-weight-bold">{{ props.item.name }}</v-card-title>
-
-                                <v-divider></v-divider>
-
-                                <v-list dense>
-                                    <v-list-tile class="mb-2 dataiterator-item" v-for="(it,index) in props.item.list" :key="index">
-                                        <v-layout row wrap>
-                                            <v-flex>
-                                                <v-list-tile-content>{{it.key}}</v-list-tile-content>
-                                            </v-flex>
-                                            <v-flex>
-                                                <v-list-tile-content class="align-end">{{ it.value }}</v-list-tile-content>
-                                            </v-flex>
-                                        </v-layout>
-                                    </v-list-tile>
-                                </v-list>
-                            </v-card>
-                        </v-flex>
-                    </template>
-                </v-data-iterator>
-            </v-card>
+            <v-row>
+                <v-col cols=6 v-for="(item,i) in data.items" :key="i">
+                    <v-card >
+                        <v-card-title class="subheading font-weight-bold">{{ item.name }}</v-card-title>
+                        <v-divider></v-divider>
+                        <v-card-text>
+                            <v-simple-table>
+                                <tbody>
+                                    <tr v-for="(it,index) in item.list" :key="index">
+                                        <td>{{it.key}}</td>
+                                        <td>{{ it.value }}</td>
+                                    </tr>
+                                </tbody>
+                            </v-simple-table>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
         </v-container>
     </v-content>
 </template>
@@ -57,7 +49,8 @@
                     {
                         text:'Products',
                         disabled:false,
-                        to:'/products/list'
+                        to:'/products',
+                        exact:true,
                     },
                     {
                         text:'view',

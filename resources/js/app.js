@@ -1,14 +1,10 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
-import Vuetify from 'vuetify'
+import vuetify from './components/vuetify.js'
 import VueRouter from 'vue-router'
-import colors from 'vuetify/es5/util/colors'
 import {routes} from './router.js'
 import AppComponent from './components/AppComponent.vue'
-
-
-Vue.use(Vuetify)
 Vue.use(VueRouter)
 const router = new VueRouter({
   routes,
@@ -33,13 +29,14 @@ Vue.mixin({
 })
 //Vue.component('app', require('./components/AppComponent.vue'));
 const app = new Vue({
+    vuetify,
     router:router,
     el:'#app',
     components:{
         'app-component':AppComponent,
     },
     created(){
-        this.$vuetify.theme.primary = colors.teal.darken1
+        
         var localToken = localStorage.token;
         if (localToken === undefined){
           this.$router.push('/login')

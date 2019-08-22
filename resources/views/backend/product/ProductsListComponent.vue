@@ -2,7 +2,8 @@
     <div>
         <v-content>
             <div>
-                <v-breadcrumbs :items="breadcrumbs" divider=">"></v-breadcrumbs>
+                <!--<v-btn flat class="text-capitalize" @click="$router.back()"><v-icon>arrow_back</v-icon>Back</v-btn>-->
+                <v-breadcrumbs class="" :items="breadcrumbs" divider=">"></v-breadcrumbs>
             </div>
             <v-container fluid class="pt-0">
                 <div v-if="loader" >
@@ -18,7 +19,7 @@
                                             <v-avatar>
                                                 <v-icon>hourglass_empty</v-icon>
                                             </v-avatar> 
-                                            <router-link to="pending" class="white--text">
+                                            <router-link to="/inventory/products/pending" class="white--text">
                                                 Products Pending Approval: 
                                             </router-link>
                                         </v-chip>
@@ -35,7 +36,7 @@
                                             <v-avatar>
                                                 <v-icon>T</v-icon>
                                             </v-avatar>
-                                            <router-link to="tally" class="white--text">
+                                            <router-link to="/inventory/products/tally" class="white--text">
                                                 To be synced with Tally:
                                             </router-link>
                                         </v-chip>
@@ -63,6 +64,7 @@
         </v-content>
     </div>
 </template>
+
 <script>
     import ListComponent from '../../../js/components/ListComponent.vue'
     import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
@@ -92,12 +94,13 @@
                     {
                         text:'Products',
                         disabled:true,
-                        to:'/products/list'
+                        to:'/inventory/products'
                     },
                 ]
             }
         },
         mounted(){
+            this.$emit('top-menu-url','products/get_menu')
             this.loader=true
             axios.get('/products/filterables').then((response)=>{
                 if(response.status == 200)
@@ -119,10 +122,13 @@
         },
         methods:{
             editItem($event){
-                this.$router.push('edit/'+$event)
+                this.$router.push('/inventory/products/edit/'+$event)
             },
             redirectAdd(){
-                this.$router.push('add')
+                this.$router.push('/inventory/products/add')
+            },
+            goBAck(){
+                this.$router.back()
             }
         }
     }

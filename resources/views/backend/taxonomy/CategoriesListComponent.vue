@@ -59,14 +59,9 @@
                         to:'/'
                     },
                     {
-                        text:'Products',
-                        disabled:false,
-                        to:'/products/list'
-                    },
-                    {
                         text:'Categories',
                         disabled:true,
-                        to:'/products/categories/list'
+                        to:'/inventory/categories'
                     },  
                 ]
             }

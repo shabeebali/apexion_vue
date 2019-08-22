@@ -53,12 +53,13 @@
                     {
                         text:'Products',
                         disabled:false,
-                        to:'/products/list'
+                        to:'/inventory/products',
+                        exact:true,
                     },
                     {
                         text:'Pending',
                         disabled:true,
-                        to:'/products/pending'
+                        to:'/inventory/products/pending'
                     },  
                 ]
             }
@@ -79,10 +80,10 @@
         },
         methods:{
             editItem($event){
-                this.$router.push('edit/'+$event)
+                this.$router.push('/inventory/products/edit/'+$event+'/pending')
             },
             redirectAdd(){
-                this.$router.push('add')
+                this.$router.push('/inventory/products/add/pending')
             }
         }
     }

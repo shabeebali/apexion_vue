@@ -1,11 +1,15 @@
 <template>
     <div>
-      <v-toolbar dense app clipped-left clipped-right fixed dark color="teal darken-4">
-        <v-toolbar-side-icon v-if="$vuetify.breakpoint.smAndDown" @click="$emit('sidebar-toggle')"></v-toolbar-side-icon>
+      <v-app-bar dense app clipped-left clipped-right fixed dark color="teal darken-4">
         <v-btn icon @click.stop="main_menu_dialog = true" title="Apps Menu">
           <v-icon>apps</v-icon> 
         </v-btn>
-        <img src="/images/apexion_logo.svg"/>
+        <v-toolbar-items>
+          <template v-for="items in top_menu_items">
+            <v-btn class="headline" text disabled  v-if="items.menu_name">{{items.menu_name}}</v-btn>
+            <v-btn v-else class="text-capitalize"text text :to="items.route">{{items.text}}</v-btn>
+          </template>
+        </v-toolbar-items>
         <v-spacer></v-spacer>
         Welcome {{username}}
         <v-menu offset-y>
@@ -18,15 +22,15 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-tile @click="profile">
-              <v-list-tile-title>Profile</v-list-tile-title>
-            </v-list-tile>
-            <v-list-tile @click="logout">
-              <v-list-tile-title>Logout</v-list-tile-title>
-            </v-list-tile>
+            <v-list-item @click="profile">
+              <v-list-item-title>Profile</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="logout">
+              <v-list-item-title>Logout</v-list-item-title>
+            </v-list-item>
           </v-list>
         </v-menu>
-      </v-toolbar>
+      </v-app-bar>
       <v-dialog v-model="main_menu_dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
           <v-card color="teal" :style="{background: menuBackground, backgroundSize:'cover'}">
               <v-toolbar dark dense color="primary">
@@ -77,9 +81,25 @@
               menuBackground:'url("'+this.$asset+'/svg/apexion_logo.svg")',
               username : '',
               main_menu_items:[],
+              top_menu_items:[],
             }
         },
-        props:[],
+        props:['topMenuUrl'],
+        watch:{
+          topMenuUrl:{
+            handler(){
+              if(this.topMenuUrl != ''){
+                axios.get(this.topMenuUrl).then((response)=>{
+                    this.top_menu_items = response.data.items
+                    console.log(this.top_menu_items)
+                })
+              }
+              else{
+                this.top_menu_items = []
+              }
+            }
+          }
+        },
         created:function(){
 
         },
@@ -112,6 +132,9 @@
             },
             profile(){
 
+            },
+            updateTopMenu(url){
+               var url = this.topMenuUrl
             }
         }
     }

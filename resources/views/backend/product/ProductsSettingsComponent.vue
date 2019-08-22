@@ -5,121 +5,143 @@
                 <v-breadcrumbs :items="breadcrumbs" divider=">"></v-breadcrumbs>
             </div>
             <v-container fluid class="pt-0">
-                <v-expansion-panel class="mb-2">
-                    <v-expansion-panel-content>
-                        <template v-slot:header>
-                            <div>Category Types</div>
-                        </template>
-                        <v-card class="pa-2">
-                            <v-btn absolute dark fab bottom small right color="pink" class="mt-2" @click="category_type_add_dialog=true">
-                              <v-icon>add</v-icon>
-                            </v-btn>
-                            <v-data-table hide-actions :loading="loading.category_type_list" :headers="category_type_list.headers" :items="category_type_list.items" light>
-                                <template v-slot:items="props">
-                                    <template v-for="(it,key) in props.item" v-if="key != 'id'">
-                                        <td v-if="it.actions" class="justify-end layout">
-                                            <v-btn icon v-if="it.edit" @click="editCategoryTypeItem(it)">
-                                                <v-icon small >edit</v-icon>
-                                            </v-btn>
-                                            <v-btn icon v-if="it.delete" @click="deleteItem(it)">
-                                                <v-icon small>delete</v-icon>
-                                            </v-btn>
-                                        </td>
-                                        <td v-else>{{it}}</td>
+                <v-expansion-panels>
+                    <v-expansion-panel class="mb-2">
+                        <v-expansion-panel-header>Category Types</v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <v-card class="pa-0">
+                                
+                                <v-data-table hide-default-footer :loading="loading.category_type_list" :headers="category_type_list.headers" :items="category_type_list.items" light>
+                                    <template v-slot:item.actions="{ item }">
+                                        <v-tooltip bottom v-if="item.actions.edit">
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn icon v-on="on" @click="editCategoryTypeItem(item)">
+                                                    <v-icon  small>edit</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Edit</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom v-if="item.actions.delete">
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn icon v-on="on" @click="deleteItem(item)">
+                                                    <v-icon  small>delete</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Delete</span>
+                                        </v-tooltip>
                                     </template>
-                                </template>
-                                <template v-slot:no-data>
-                                    <v-alert :value="true" color="info" icon="warning">
-                                        No data available. Please Add.
-                                    </v-alert>
-                                </template>
-                            </v-data-table>
-                        </v-card>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel class="mb-2">
-                    <v-expansion-panel-content>
-                        <template v-slot:header>
-                            <div>Code Order</div>
-                        </template>
-                        <v-card class="pa-2">
-                            <v-list>
-                                <draggable v-model="codeOrderArray" @start="drag=true" @end="drag=false">
-                                   <v-list-tile style="border:1px solid #ddd; cursor:move;" v-for="element in codeOrderArray" :key="element.id">{{element.name}}</v-list-tile>
-                                </draggable>
-                            </v-list>
-                            <v-card-actions>
-                                <v-btn @click.stop="saveCodeOrder" color="primary">Save</v-btn>
-                                <v-btn @click.stop="resetCodeOrder">Reset</v-btn>
-                            </v-card-actions>
+                                    <template v-slot:no-data>
+                                        <v-alert :value="true" color="info" icon="warning">
+                                            No data available. Please Add.
+                                        </v-alert>
+                                    </template>
+                                </v-data-table>
+                                <v-row justify="end" class="mx-0">
+                                    <v-col md="auto">
+                                        <v-btn depressed dark tile right color="primary" class="mt-2" @click="category_type_add_dialog=true">Add
+                                        </v-btn>
+                                    </v-col>
+                                </v-row>
+                            </v-card>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel class="mb-2">
+                        <v-expansion-panel-header>Code Order</v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <v-card class="pa-0">
+                                <v-list>
+                                    <draggable v-model="codeOrderArray" @start="drag=true" @end="drag=false">
+                                        
+                                       <v-list-item style="border:1px solid #ddd; cursor:move;" v-for="element in codeOrderArray" :key="element.id">
+                                           <v-list-item-icon>
+                                                <v-icon>menu</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-content>
+                                                {{element.name}}
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </draggable>
+                                </v-list>
+                                <v-card-actions>
+                                    <div class="flex-grow-1"></div>
+                                    <v-btn text @click.stop="saveCodeOrder" color="primary">Save</v-btn>
+                                    <v-btn text @click.stop="resetCodeOrder">Reset</v-btn>
+                                </v-card-actions>
 
-                        </v-card>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel class="mb-2">
-                    <v-expansion-panel-content>
-                        <template v-slot:header>
-                            <div>PriceLists</div>
-                        </template>
-                        <v-card class="pa-2">
-                            <v-btn absolute dark fab bottom small right color="pink" class="mt-2" @click="pricelist_add_dialog=true">
-                              <v-icon>add</v-icon>
-                            </v-btn>
-                            <v-data-table hide-actions :loading="loading.pricelist_list" :headers="pricelist.headers" :items="pricelist.items" light>
-                                <template v-slot:items="props">
-                                    <template v-for="(it,key) in props.item" v-if="key != 'id'">
-                                        <td v-if="it.actions" class="justify-end layout">
-                                            <v-btn icon v-if="it.edit" @click="editPricelistItem(it)">
-                                                <v-icon small >edit</v-icon>
-                                            </v-btn>
-                                            <v-btn icon v-if="it.delete" @click="deletePricelistItem(it)">
-                                                <v-icon small>delete</v-icon>
-                                            </v-btn>
-                                        </td>
-                                        <td v-else>{{it}}</td>
+                            </v-card>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel class="mb-2">
+                        <v-expansion-panel-header>PriceLists</v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <v-card class="pa-2">
+                                <v-btn absolute dark fab bottom small right color="pink" class="mt-2" @click="pricelist_add_dialog=true">
+                                  <v-icon>add</v-icon>
+                                </v-btn>
+                                <v-data-table hide-default-footer :loading="loading.pricelist_list" :headers="pricelist.headers" :items="pricelist.items" light>
+                                    <template v-slot:item.actions="{ item }">
+                                        <v-tooltip bottom v-if="item.actions.edit">
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn icon v-on="on" @click="editPricelistItem(item)">
+                                                    <v-icon  small>edit</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Edit</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom v-if="item.actions.delete">
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn icon v-on="on" @click="deletePricelistItem(item)">
+                                                    <v-icon  small>delete</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Delete</span>
+                                        </v-tooltip>
                                     </template>
-                                </template>
-                                <template v-slot:no-data>
-                                    <v-alert :value="true" color="info" icon="warning">
-                                        No data available. Please Add.
-                                    </v-alert>
-                                </template>
-                            </v-data-table>
-                        </v-card>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
-                <v-expansion-panel class="mb-2">
-                    <v-expansion-panel-content>
-                        <template v-slot:header>
-                            <div>Warehouses</div>
-                        </template>
-                        <v-card class="pa-2">
-                            <v-btn absolute dark fab bottom small right color="pink" class="mt-2" @click="warehouse_add_dialog=true">
-                              <v-icon>add</v-icon>
-                            </v-btn>
-                            <v-data-table hide-actions :loading="loading.warehouse" :headers="warehouse.headers" :items="warehouse.items" light>
-                                <template v-slot:items="props">
-                                    <template v-for="(it,key) in props.item" v-if="key != 'id'">
-                                        <td v-if="it.actions" class="justify-end layout">
-                                            <v-btn icon v-if="it.edit" @click="editWarehouse(it)">
-                                                <v-icon small >edit</v-icon>
-                                            </v-btn>
-                                            <v-btn icon v-if="it.delete" @click="deleteWarehouse(it)">
-                                                <v-icon small>delete</v-icon>
-                                            </v-btn>
-                                        </td>
-                                        <td v-else>{{it}}</td>
+                                    <template v-slot:no-data>
+                                        <v-alert :value="true" color="info" icon="warning">
+                                            No data available. Please Add.
+                                        </v-alert>
                                     </template>
-                                </template>
-                                <template v-slot:no-data>
-                                    <v-alert :value="true" color="info" icon="warning">
-                                        No data available. Please Add.
-                                    </v-alert>
-                                </template>
-                            </v-data-table>
-                        </v-card>
-                    </v-expansion-panel-content>
-                </v-expansion-panel>
+                                </v-data-table>
+                            </v-card>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel class="mb-2">
+                        <v-expansion-panel-header>Warehouses</v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <v-card class="pa-2">
+                                <v-btn absolute dark fab bottom small right color="pink" class="mt-2" @click="warehouse_add_dialog=true">
+                                  <v-icon>add</v-icon>
+                                </v-btn>
+                                <v-data-table hide-default-footer :loading="loading.warehouse" :headers="warehouse.headers" :items="warehouse.items" light>
+                                    <template v-slot:item.actions="{ item }">
+                                        <v-tooltip bottom v-if="item.actions.edit">
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn icon v-on="on" @click="editWarehouse(item)">
+                                                    <v-icon  small>edit</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Edit</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom v-if="item.actions.delete">
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn icon v-on="on" @click="deleteWarehouse(item)">
+                                                    <v-icon  small>delete</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Delete</span>
+                                        </v-tooltip>
+                                    </template>
+                                    <template v-slot:no-data>
+                                        <v-alert :value="true" color="info" icon="warning">
+                                            No data available. Please Add.
+                                        </v-alert>
+                                    </template>
+                                </v-data-table>
+                            </v-card>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+                </v-expansion-panels>
             </v-container>
         </v-content>
         <category-type-add :dialog="category_type_add_dialog" v-on:close-category-type-add-dialog="updateCategoryTypeList"></category-type-add>
@@ -221,7 +243,8 @@ export default{
                     {
                         text:'Products',
                         disabled:false,
-                        to:'/products/list'
+                        to:'/products',
+                        exact:true,
                     },
                     {
                         text:'Settings',

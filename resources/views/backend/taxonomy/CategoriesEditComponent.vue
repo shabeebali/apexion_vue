@@ -2,18 +2,18 @@
     <div>
         <v-dialog v-model="dialog" lazy persistent>
             <v-card v-if="success" class="pa-4">
-                <v-layout row wrap>
-                    <v-flex xs12 >
-                        <div class="text-xs-center">
+                <v-row wrap>
+                    <v-col cols=12 >
+                        <div class="text-center">
                             <v-icon x-large color="green lighten-1">check_circle</v-icon>
                         </div>
-                    </v-flex>
-                    <v-flex xs12>
-                        <div class="text-xs-center">
-                            <div>Saved</div>
+                    </v-col>
+                    <v-col cols=12>
+                        <div class="text-center">
+                            <div>Category Updated</div>
                         </div>
-                    </v-flex>
-                </v-layout>
+                    </v-col>
+                </v-row>
             </v-card>
             <v-card v-else>
                 <v-card-title>
@@ -37,8 +37,8 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" flat @click="$emit('close-edit-dialog')">Close</v-btn>
-                    <v-btn color="blue darken-1" flat @click="saveItem">Save</v-btn>
+                    <v-btn color="blue darken-1" text @click="$emit('close-edit-dialog')">Close</v-btn>
+                    <v-btn color="blue darken-1" text @click="saveItem">Save</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>

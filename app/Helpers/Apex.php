@@ -180,7 +180,7 @@ class Apex
                 $headers[] = ['text'=>$fields[$s]['text'],'value'=>$s];
             }
         }
-        $headers[]=['text'=>'Actions','value'=>'actions','align'=>'right'];
+        $headers[]=['text'=>'Actions','value'=>'actions','align'=>'right','sortable'=> 0];
         $page = 1;
         foreach ($searcheable as $value) {
             $search[]=[$value,'like','%'.$request->get('search').'%'];
@@ -199,6 +199,9 @@ class Apex
         if($request->sortby)
         {
             $data = $data->orderBy($request->sortby,$request->descending?'desc':'asc');
+        }
+        else{
+            $data = $data->orderBy('id','desc');
         }
         $data = $data->paginate($request->rpp);
         $user = \Auth::user();

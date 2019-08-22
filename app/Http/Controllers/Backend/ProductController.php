@@ -28,27 +28,31 @@ class ProductController extends Controller
     {
         $user = \Auth::user();
         $items = [];
+        $items[]=[
+            'menu_name' => 'Inventory'
+        ];
         if($user->can('list_products')){
             $items[] = [
                 'text'=>'Products',
-                'route'=>'/products/list',
+                'route'=>'/inventory/products',
                 'icon'=>'list_alt',
             ];
         }
         if($user->can('list_category')){
             $items[] = [
                 'text'=>'Categories',
-                'route'=>'/products/categories/list',
+                'route'=>'/inventory/categories',
                 'icon'=>'category',
             ];
         }
         if($user->can('access_product_settings')){
             $items[] = [
                 'text'=>'Settings',
-                'route'=>'/products/settings',
+                'route'=>'/inventory/settings',
                 'icon'=>'settings',
             ];
         }
+
         return response()->json([
             'items' => $items
         ]);
@@ -293,6 +297,7 @@ class ProductController extends Controller
         $obj->sku='dash'.$obj->slug;
         $obj->publish = $request->pending ? $request->pending : 0 ;
         $obj->tally = $request->tally ? $request->tally : 0 ;
+        $obj->stock = 0;
         $obj->save();
         foreach ($category_types as $type) {
             $obj->categories()->attach($request->get($type->slug));
@@ -319,9 +324,13 @@ class ProductController extends Controller
         }
         $warehouses = Warehouse::all();
         $arr=[];
+        $total_stock = 0 ;
         foreach ($warehouses as $wh) {
             $arr[$wh->id] = ['stock'=>$request->get('warehouse_'.$wh->slug) ? $request->get('warehouse_'.$wh->slug):0];
+            $total_stock = $total_stock + ($request->get('warehouse_'.$wh->slug) ? $request->get('warehouse_'.$wh->slug):0);
         }
+        $obj->stock = $total_stock;
+        $obj->save();
         $obj->warehouses()->sync($arr);
         return response()->json([
             'message'=>'success'

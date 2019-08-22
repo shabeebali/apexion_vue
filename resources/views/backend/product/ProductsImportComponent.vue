@@ -9,37 +9,31 @@
 					<v-subheader class="headline">Product Import</v-subheader>
 					<v-card-text>
 						
-						<v-layout row wrap>
-							<v-flex xs12>
-								<p class="pl-4">Please upload Excel file (.xslx) only</p>
-							</v-flex>
-							<v-flex xs12>
-								<upload-btn
-									@file-update="update"
-								  	title="Click Here to select file.."
-								>
-								  <template slot="icon">
-								    <v-icon>add</v-icon>
-								  </template>
-								</upload-btn>
-							</v-flex>
-							<v-flex xs12 lg3 md4 sm4 px-4>
-								<v-select label="Method" :items="items" v-model="method" :error-messages="error"></v-select>
-							</v-flex>
-							<v-flex xs12 pa-3>
-								<v-btn color="blue" dark @click="upload">
-									Upload
-									<v-icon class="pl-1">
-										cloud_upload
-									</v-icon>
-								</v-btn>
-							</v-flex>
-							<v-flex xs12>
+						<v-row wrap>
+							<v-col class="col-3">
+								<v-file-input label="Click Here to select file.." persistent-hint hint="Please upload Excel file (.xslx) only" @change="update"></v-file-input>
+							</v-col>
+							<v-col class="col-2">
+								<v-select label="Method" :items="methods" v-model="method" :error-messages="method_error"></v-select>
+							</v-col>
+							<v-col class="col-2" >
+								<v-row>
+									<v-col class="col-12 align-center">
+										<v-btn color="blue" dark @click="upload">
+											Upload
+											<v-icon class="">
+												cloud_upload
+											</v-icon>
+										</v-btn>
+									</v-col>
+								</v-row>
+							</v-col>
+							<v-col class="col-12">
 								<v-alert v-model="alert" :type="alert_type" dismissible>
 									<span v-html="alert_messages"></span>
 								</v-alert>
-							</v-flex>
-						</v-layout>
+							</v-col>
+						</v-row>
 					</v-card-text>	
 				</v-card>
 			</v-container>
@@ -47,7 +41,6 @@
 	</div>
 </template>
 <script>
-	import UploadButton from 'vuetify-upload-button'
 	export default{
 		data(){
 			return{
@@ -64,12 +57,13 @@
                     {
                         text:'Products',
                         disabled:false,
-                        to:'/products/list'
+                        to:'/inventory/products',
+                        exact:true,
                     },
                     {
                         text:'Import',
                         disabled:true,
-                        to:'/products/import'
+                        to:'/inventory/products/import'
                     },  
                 ],
                 items:[
@@ -132,8 +126,5 @@
 				}
 			},
 		},
-		components: {
-		  'upload-btn': UploadButton
-		}
 	}
 </script>

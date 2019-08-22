@@ -91,48 +91,52 @@ export const routes=[
         ]
     },
     {
-        path:'/products',
-        name:'Products',
+        path:'/inventory',
+        name:'Inventory',
         component:ProductsIndex,
         children:[
             {
-                path:'list',
-                component:ProductsList,
-            },
-            {
-                path:'pending',
-                component:ProductsPendingList,
-            },
-            {
-                path:'tally',
-                component:ProductsTallyList,
-            },
-            {
-                path:'add',
-                component:ProductsAdd,
-            },
-            {
-                path:'edit/:id',
-                component:ProductsEdit,
-            },
-            {
-                path:'view/:id',
-                component:ProductsView,
-            },
-            {
-                path:'import',
-                component:ProductsImport,
-            },
-            {
-                path:'settings',
-                component:ProductsSettings,
+                path:'products',
+                name:'Products',
+                component:ProductsIndex,
+                children:[
+                    {
+                        path:'/',
+                        component:ProductsList,
+                    },
+                    {
+                        path:'pending',
+                        component:ProductsPendingList,
+                    },
+                    {
+                        path:'tally',
+                        component:ProductsTallyList,
+                    },
+                    {
+                        path:'add/:redirect?',
+                        component:ProductsAdd,
+                    },
+                    {
+                        path:'edit/:id/:redirect?',
+                        component:ProductsEdit,
+                    },
+                    {
+                        path:'view/:id',
+                        component:ProductsView,
+                    },
+                    {
+                        path:'import',
+                        component:ProductsImport,
+                    },
+                    
+                ]
             },
             {
                 path:'categories',
                 component:ProductsCategoriesIndex,
                 children:[
                     {
-                        path:'list',
+                        path:'/',
                         component:ProductsCategoriesList,
                     },
                     {
@@ -141,7 +145,11 @@ export const routes=[
                     },
                 ]
             },
-        ]
+            {
+                path:'settings',
+                component:ProductsSettings,
+            },
+],
     },
     {
         path:'/customers',

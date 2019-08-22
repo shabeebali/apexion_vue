@@ -21,7 +21,7 @@
                     									<v-avatar>
                     										<v-icon>hourglass_empty</v-icon>
                     									</v-avatar>
-                    									<router-link to="products/pending" class="white--text">
+                    									<router-link to="inventory/products/pending" class="white--text">
                     										Products Pending Approval:
                     									</router-link>
                     								</v-chip>
@@ -36,7 +36,7 @@
                 										<v-avatar>
                 											<v-icon>T</v-icon>
                 										</v-avatar>
-                										<router-link to="products/tally" class="white--text">
+                										<router-link to="inventory/products/tally" class="white--text">
                 											To be synced with Tally:
                 										</router-link>
                 									</v-chip>
@@ -51,7 +51,7 @@
                 										<v-avatar>
                 											<v-icon>list_alt</v-icon>
                 										</v-avatar>
-                										<router-link to="products/list" class="white--text">
+                										<router-link to="inventory/products" class="white--text">
                 											Total Active Products
                 										</router-link>
                 									</v-chip>
@@ -171,6 +171,7 @@ export default{
     		this.products_count = response.data.products_count
     		this.customers_count = response.data.customers_count
     	})
+        this.$emit('top-menu-url','')
     }
 }
 </script>

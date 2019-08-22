@@ -1,42 +1,36 @@
 <template>
     <div>
         <v-app id="products-view">
-            <nav-drawer v-bind:items="items" v-bind:sidebar="sidebar" v-on:close-sidebar="toggleSidebar"></nav-drawer>
-            <router-view></router-view>
+            <router-view v-on:snackbar="snackBar"></router-view>
+            <v-snackbar v-model="snackbar" :timeout="timeout" :color="color" bottom right>
+                {{ text }}
+            <v-btn dark text @click="snackbar = false">Close</v-btn>
+            </v-snackbar>
         </v-app>
     </div>
 </template>
 <script>
-import NavDrawer from '../../../js/components/NavDrawerComponent.vue';
 export default{
-    props:['sidebarToggle'],
     data(){
         return{
             page_title:'Products',
-            sidebar:false,
-            items:''
+            snackbar:false,
+            text:'',
+            timeout:2000,
+            color:'',
         }
     },
     components:{
-        'nav-drawer': NavDrawer,
-    },
-    watch:{
-        sidebarToggle:{
-            handler(){
-                this.sidebar = !this.sidebar
-            }
-        }
     },
     mounted(){
-        axios.get('products/get_menu').then((response)=>{
-            this.items = response.data.items
-        })
+        this.$emit('top-menu-url','products/get_menu')
     },
     methods:{
-        toggleSidebar(){
-            this.sidebar = !this.sidebar
+        snackBar(txt,color){
+            this.snackbar = true
+            this.text = txt
+            this.color = color
         }
     }
-
 }
 </script>
