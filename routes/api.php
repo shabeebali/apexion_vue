@@ -98,6 +98,7 @@ Route::middleware(['auth:api'])->group(function(){
 
     Route::get('products/warehouses','Backend\WarehouseController@index');
     Route::post('products/warehouse/add','Backend\WarehouseController@save');
-    Route::post('logout','Auth\LoginController@logout');
+    
 });
+Route::post('logout','Auth\LoginController@logout');
 Route::post('login','Auth\LoginController@login');
