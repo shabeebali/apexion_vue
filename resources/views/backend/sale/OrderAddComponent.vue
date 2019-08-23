@@ -10,7 +10,7 @@
                 <v-btn tile color="primary" :disabled="customerSelect == null || count == 1" @click="create">Create</v-btn>
             </v-toolbar>
             <v-card>
-                <v-row>
+                <v-row class="mx-0" justify="space-between">
                     <v-col cols=6>
                         <v-autocomplete
                           v-model="customerSelect"
@@ -22,8 +22,12 @@
                           flat
                           clearable
                           hide-no-data
-                            hide-details
+                          hide-details
+                          label="Customer"
                         ></v-autocomplete>
+                    </v-col>
+                    <v-col cols=4>
+                        <v-select v-model="pricelistSelect" :items="pricelist_items" label="Pricelist"></v-select>
                     </v-col>
                 </v-row>
                 <v-row class="mx-0">
@@ -35,19 +39,19 @@
                                         <tr>
                                             <th class="text-left">#</th>
                                             <th class="text-left">Product</th>
-                                            <th class="text-left" >Quantity</th>
-                                            <th class="text-left" >Rate</th>
-                                            <th class="text-left" >Price</th>
-                                            <th class="text-left">Action</th>
+                                            <th class="text-right" >Quantity</th>
+                                            <th class="text-right" >Rate</th>
+                                            <th class="text-right" >Price</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="(item,index) in items" :key="index">
                                             <td>{{item.line}}</td>
                                             <td>{{item.product}}</td>
-                                            <td>{{item.qty}}</td>
-                                            <td>{{item.rate}}</td>
-                                            <td>{{item.price}}</td>
+                                            <td class="text-right">{{item.qty}}</td>
+                                            <td class="text-right">{{item.rate}}</td>
+                                            <td class="text-right">{{item.price}}</td>
                                             <td><v-btn icon fab small @click.stop="removeItem(item.pos)"><v-icon>mdi-minus-circle</v-icon></v-btn></td>
                                         </tr>
                                         <tr>
@@ -59,17 +63,35 @@
                                                   :items="productItems"
                                                   :search-input.sync="searchProduct"
                                                   cache-items
-                                                  class="mx-4"
+                                                  class="mx-0 py-0 mt-0"
                                                   flat
                                                   clearable
                                                   hide-no-data
                                                     hide-details
                                                 ></v-autocomplete>
                                             </td>
-                                            <td><v-text-field v-model="qty"></v-text-field></td>
-                                            <td><v-text-field v-model="rate"></v-text-field></td>
-                                            <td><v-text-field readonly :rules="[rules.decimal]" :value="parseInt(qty)*parseFloat(rate)"></v-text-field></td>
+                                            <td><v-text-field class="text-right" style="direction:rtl;" v-model="qty"></v-text-field></td>
+                                            <td><v-text-field class="text-right" style="direction:rtl;" :loading="rateLoading" v-model="rate"></v-text-field></td>
+                                            <td><v-text-field class="text-right" style="direction:rtl;" readonly :rules="[rules.decimal]" :value="parseInt(qty)*parseFloat(rate)"></v-text-field></td>
                                             <td><v-btn icon rounded small :disabled="productSelect == null || isNaN(parseInt(qty)*parseFloat(rate))" @click.stop="addLine"><v-icon>mdi-plus-circle</v-icon></v-btn></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            
+                                            <td class="text-right">Discount</td>
+                                            <td><v-text-field class="text-end" style="direction:rtl;" v-model="discount" append-icon="mdi-minus"></v-text-field></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            
+                                            <td class="text-right">Total</td>
+                                            <td><v-text-field readonly class="text-end" style="direction:rtl;" v-model="total"></v-text-field></td>
+                                            <td></td>
                                         </tr>
                                     </tbody>
                                 </v-simple-table>
@@ -95,9 +117,14 @@ export default{
             productSelect:null,
             productLoading:false,
             searchProduct:null,
+            discount : 0,
+            total : 0,
             items:[],
             qty:1,
             rate:0,
+            rateLoading:false,
+            pricelist_items:[],
+            pricelistSelect:null,
             rules:{
                 decimal: value => !isNaN(value) || 'Must be an number',
             },
@@ -121,6 +148,13 @@ export default{
                 },  
             ]
         }
+    },
+    mounted(){
+        axios.get('sale/orders/getpl').then((response)=>{
+            if(response.status == 200){
+                this.pricelist_items = response.data.items
+            }
+        })
     },
     watch: {
         search (val) {
@@ -147,11 +181,36 @@ export default{
                 }
             })
         },
-    },
-    mounted(){
-    },
-    computed:{
-       
+        productSelect:{
+            handler(){
+                this.setRate() 
+            }
+        },
+        pricelistSelect:{
+            handler(){
+                this.setRate() 
+                if(this.items.length > 0){
+                    Object.keys(this.items).forEach((key)=>{
+                        axios.get('sale/orders/getrate?&id='+this.items[key].id+'&pl='+this.pricelistSelect).then((response)=>{
+                            if(response.status == 200){
+                                var gst = response.data.gst
+                                var landing_price = response.data.landing_price
+                                var value = response.data.value
+                                this.items[key].rate = ((parseFloat(landing_price)*((parseFloat(value)/100)+1))*((parseFloat(gst)/100)+1)).toFixed(2)
+                                this.items[key].price = parseFloat(this.items[key].rate)*parseInt(this.items[key].qty)
+                                this.updateTotal()
+                            }
+                        })
+
+                    })
+                }
+            }
+        },
+        discount:{
+            handler(){
+                this.updateTotal()
+            }
+        }
     },
     methods:{
         addLine(){
@@ -169,6 +228,7 @@ export default{
             this.rate = 0
             this.searchProduct=null
             this.productSelect=null
+            this.updateTotal()
         },
         removeItem(pos){
             this.items.splice(pos,1)
@@ -179,16 +239,46 @@ export default{
                 tempCount = tempCount+1
             })
             this.count = parseInt(this.items.length)+1
+            this.updateTotal()
         },
         create(){
             var fD = new FormData()
-            fD.append('customer_id',customerSelect)
-            fD.append('items',items)
+            fD.append('customer_id',this.customerSelect)
+            fD.append('items',JSON.stringify(this.items))
+            fD.append('discount',this.discount)
+            fD.append('total',this.total)
             axios.post('sale/orders/add',fD).then((response)=>{
                 if(response.status == 200){
-                    
+                    this.$router.push('/sale/orders')
+                }
+                else{
+                    alert('Something went wrong!')
                 }
             })
+        },
+        updateTotal(){
+            var temp = 0;
+            Object.keys(this.items).forEach((key)=>{
+                temp = parseFloat(temp)+parseFloat(this.items[key].price)
+            })
+            this.total = parseFloat(temp)-parseFloat(this.discount)
+        },
+        setRate(){
+            if(this.pricelistSelect != null && (this.productSelect != undefined ||this.productSelect != null)){
+                this.rateLoading = true
+                axios.get('sale/orders/getrate?&id='+this.productSelect+'&pl='+this.pricelistSelect).then((response)=>{
+                    if(response.status == 200){
+                        var gst = response.data.gst
+                        var landing_price = response.data.landing_price
+                        var value = response.data.value
+                        this.rate = ((parseFloat(landing_price)*((parseFloat(value)/100)+1))*((parseFloat(gst)/100)+1)).toFixed(2)
+                        this.rateLoading = false
+                    }
+                })
+            }
+            if(this.productSelect == undefined){
+                this.rate = 0
+            }
         }
     }
 }

@@ -15,11 +15,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        /*
+        
         $this->call(App\Modules\Product\resources\database\seeds\PermissionSeeder::class);
         $this->call(App\Modules\Customer\resources\database\seeds\PermissionSeeder::class);
         $this->call(App\Modules\Settings\resources\database\seeds\PermissionSeeder::class);
         $this->call(App\Modules\Taxonomy\resources\database\seeds\PermissionSeeder::class);
+        $this->call(App\Modules\Sale\resources\database\seeds\PermissionSeeder::class);
+        /*
         $user = User::create(['name'=>'admin','email'=>'admin@admin','password'=>Hash::make('admin')]);
         $role = Role::create(['name' => 'admin','guard_name'=>'api']);
         $user->assignRole('admin');

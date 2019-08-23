@@ -84,6 +84,7 @@
             </v-tooltip>
             <v-btn text icon v-if="Object.keys(filterables).length > 0" @click.stop="listFilterModel=!listFilterModel"><v-icon>filter_list</v-icon></v-btn>
             <v-btn v-if="Object.keys(listFields).length > 0" class="" text icon @click.stop="listSettingsModel=true"><v-icon>settings</v-icon></v-btn>
+            <v-btn tile text @click.stop="updateList"><v-icon>mdi-refresh</v-icon></v-btn>
             <v-btn text tile v-if="addFlag" class="primary" @click="$emit('open-add-dialog')">Add</v-btn>
         </v-row>
         <v-card>
@@ -170,17 +171,21 @@
                     </v-row>
                 </template>
                 <template v-slot:item.status="{ item }">
-                    {{item.status}}
+                    <div v-if="item.status == 'processing'" class="red--text">{{item.status}}</div>
+                    <div v-else class="green--text">{{item.status}}</div>
                 </template>
                 <template v-slot:item.actions="{ item }">
                     <v-tooltip bottom v-if="item.actions.edit">
                         <template v-slot:activator="{ on }">
-                            <v-btn icon v-on="on" @click="editItem(item)">
+                            <v-btn icon v-on="on" @click="editItem(item.actions)">
                                 <v-icon  small>edit</v-icon>
                             </v-btn>
                         </template>
                         <span>Edit</span>
                     </v-tooltip>
+                    <v-btn text @click="viewItem(item.actions)" v-if="item.actions.view">
+                        <v-icon  small>mdi-eye</v-icon> View
+                    </v-btn>
                     <v-tooltip bottom v-if="item.actions.delete">
                         <template v-slot:activator="{ on }">
                             <v-btn icon v-on="on" @click="deleteItem(item)">
@@ -532,6 +537,10 @@ export default{
         },
         editItem(item){
             this.$emit('open-edit-dialog',item.id)
+        },
+        viewItem(item){
+            console.log(item)
+            this.$emit('open-view-dialog',item.id)
         },
         deleteItem(item){
             this.confirmDialog('Do you really want to delete this item?').then(res => {

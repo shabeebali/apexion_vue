@@ -107,5 +107,10 @@ Route::middleware(['auth:api'])->group(function(){
     //Sale
     Route::get('sale/get_menu','Backend\SaleController@getMenu');
     Route::get('sale/orders','Backend\SaleController@index');
+    Route::post('sale/orders/add','Backend\SaleController@save');
+    Route::get('sale/orders/view/{id}','Backend\SaleController@view');
+    Route::get('sale/orders/getpl','Backend\SaleController@getPl');
+    Route::get('sale/orders/getrate','Backend\SaleController@getRate');
+    Route::post('sale/orders/complete','Backend\SaleController@complete');
 });
 Route::post('login','Auth\LoginController@login');

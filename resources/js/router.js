@@ -36,6 +36,7 @@ import OrderIndex from '../views/backend/sale/OrderIndexComponent.vue'
 import OrderList from '../views/backend/sale/OrderListComponent.vue'
 import OrderAdd from '../views/backend/sale/OrderAddComponent.vue'
 import OrderEdit from '../views/backend/sale/OrderEditComponent.vue'
+import OrderView from '../views/backend/sale/OrderViewComponent.vue'
 export const routes=[
 
     {
@@ -195,6 +196,10 @@ export const routes=[
                     {
                         path:'add',
                         component:OrderAdd,
+                    },
+                    {
+                        path:'view/:id',
+                        component:OrderView,
                     },
                     {
                         path:'edit/:id',

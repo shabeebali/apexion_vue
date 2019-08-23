@@ -18,7 +18,7 @@
                     :triggerUpdate="triggerUpdate"
                     v-on:triggered-update="triggerUpdate=false"
                     v-on:open-add-dialog="redirectAdd"
-                    v-on:open-edit-dialog="editItem"
+                    v-on:open-view-dialog="viewItem"
                     exportable
                     importable></list-component>
                 </div>
@@ -65,8 +65,8 @@
             this.$emit('top-menu-url','sale/get_menu')
         },
         methods:{
-            editItem($event){
-                this.$router.push('/sale/orders/edit/'+$event)
+            viewItem($event){
+                this.$router.push('/sale/orders/view/'+$event)
             },
             redirectAdd(){
                 this.$router.push('/sale/orders/add')
