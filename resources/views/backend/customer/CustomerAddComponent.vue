@@ -9,86 +9,84 @@
                 <v-spacer></v-spacer>
                 <v-btn color="primary" @click="add">Add</v-btn>
                 <template v-slot:extension>
-                    <v-tabs v-model="tab" color="white" grow >
-                        <v-tabs-slider color="yellow"></v-tabs-slider>
-                        <v-tab v-for="(head,key) in tabHeads" :key="key">
-                            <v-badge right v-if="head.error" color="white">
-                                <template v-slot:badge>
-                                    <v-icon color="red" small>error</v-icon>
-                                </template>
-                                <span>{{ key }}</span>
-                            </v-badge>
-                            <span v-else>{{ key }}</span>
-                        </v-tab>
-                    </v-tabs>
+                    
                 </template>
             </v-toolbar>
             <v-card>
-                <v-tabs-items v-model="tab">
+                <v-tabs v-model="tab" vertical dark background-color="primary">
+                    <v-tab v-for="(head,key) in tabHeads" :key="key">
+                        <v-badge right v-if="head.error" color="white">
+                            <template v-slot:badge>
+                                <v-icon color="red" sm=all>error</v-icon>
+                            </template>
+                            <span>{{ key }}</span>
+                        </v-badge>
+                        <span v-else>{{ key }}</span>
+                    </v-tab>
                     <v-tab-item>
                         <v-card class="pa-4" flat>
-                            <v-layout row wrap>
-                                <v-flex xs12 px-2>
+                            <v-row row wrap>
+                                <v-col cols=12 class="px-2">
                                     <v-text-field label="Name" v-model="formdata.name.value" :error-messages="formdata.name.error"></v-text-field>
-                                </v-flex>
-                            </v-layout>
-                            <v-layout row wrap>
-                                <v-flex xs12 px-2>
+                                </v-col>
+                            </v-row>
+                            <v-row row wrap>
+                                <v-col cols=12 class="px-2">
                                     <v-text-field label="Email" v-model="formdata.email.value" type="text" :error-messages="formdata.email.error"></v-text-field>
-                                </v-flex>
-                            </v-layout>
-                            <v-layout row wrap v-for="(phones,index) in formdata.phones" :key="index">
-                                <v-flex xs12 px-2>
+                                </v-col>
+                            </v-row>
+                            <v-row row wrap v-for="(phones,index) in formdata.phones" :key="index">
+                                <v-col cols=12 class="px-2">
                                     <v-text-field :label="'Phone '+parseInt(index+1)" v-model="formdata.phones[index].value":error-messages="formdata.phones[index].error" :append-icon="formdata.phones.length > 1 ? 'remove_circle' : ''" @click:append="formdata.phones.splice(index,1)"></v-text-field>
-                                </v-flex>
-                            </v-layout>
-                            <v-layout row wrap >
-                                <v-flex xs12 px-2>
+                                </v-col>
+                            </v-row>
+                            <v-row row wrap >
+                                <v-col cols=12 class="px-2">
                                     <v-btn @click="formdata.phones.push({'value':'','error':''})">Add Phone</v-btn>
-                                </v-flex>
-                            </v-layout>
+                                </v-col>
+                            </v-row>
                         </v-card>
                     </v-tab-item>
                     <v-tab-item >
                         <v-card class="pa-4" flat>
                             <template v-for="(address,index) in formdata.addresses">
                                 <v-card class="pa-4 mb-3">
-                                    <v-layout row wrap>
-                                        <v-flex xs12 px-2>
+                                    <v-row row wrap>
+                                        <v-col cols=12 class="px-2">
                                             <v-text-field label="Tag" :error-messages="formdata.addresses[index].tag.error" v-model="formdata.addresses[index].tag.value"
                                             :append-icon="formdata.addresses.length > 1 ? 'remove_circle' : ''" @click:append="formdata.addresses.splice(index,1)"></v-text-field>
-                                        </v-flex>
-                                        <v-flex xs12 px-2>
+                                        </v-col>
+                                        <v-col cols=12 class="px-2">
                                             <v-text-field label="Line 1" :error-messages="formdata.addresses[index].line1.error" v-model="formdata.addresses[index].line1.value"></v-text-field>
-                                        </v-flex>
-                                        <v-flex xs12 px-2>
+                                        </v-col>
+                                        <v-col cols=12 class="px-2">
                                             <v-text-field label="Line 2" :error-messages="formdata.addresses[index].line2.error" v-model="formdata.addresses[index].line2.value"></v-text-field>
-                                        </v-flex>
-                                        <v-flex lg3 md4 sm6 xs12 px-2>
+                                        </v-col>
+                                        <v-col lg=3 md=4 sm=6 cols=12 class="px-2">
                                             <v-text-field label="Pin Code" :error-messages="formdata.addresses[index].pin.error" v-model="formdata.addresses[index].pin.value"></v-text-field>
-                                        </v-flex>
-                                        <v-flex lg3 md4 sm6 xs12 px-2>
+                                        </v-col>
+                                        <v-col lg=3 md=4 sm=6 cols=12 class="px-2">
                                             <v-text-field label="State" :error-messages="formdata.addresses[index].state.error" v-model="formdata.addresses[index].state.value"></v-text-field>
-                                        </v-flex>
-                                        <v-flex lg3 md4 sm6 xs12 px-2>
+                                        </v-col>
+                                        <v-col lg=3 md=4 sm=6 cols=12 class="px-2">
                                             <v-text-field label="Country" :error-messages="formdata.addresses[index].country.error" v-model="formdata.addresses[index].country.value"></v-text-field>
-                                        </v-flex>
-                                        <v-flex lg3 md4 sm6 xs12 px-2>
+                                        </v-col>
+                                        <v-col lg=3 md=4 sm=6 cols=12 class="px-2">
                                             <v-text-field label="Telphone" :error-messages="formdata.addresses[index].tel.error" v-model="formdata.addresses[index].tel.value"></v-text-field>
-                                        </v-flex>
-                                    </v-layout>
+                                        </v-col>
+                                    </v-row>
                                 </v-card>
                                 <v-divider class="mb-3"></v-divider>
                             </template>
                             <v-btn @click="addAddress">Add Address</v-btn>
                         </v-card>
                     </v-tab-item>
-                </v-tabs-items>
-                <v-layout px-3>
-                    <v-flex xs12 class="text-xs-right">
+                </v-tabs>
+                <v-row px-3>
+                    <v-col cols=12 class="text-xs-right">
                         <v-btn color="primary" @click="add">Add</v-btn>
-                    </v-flex>
-                </v-layout>
+                    </v-col>
+                </v-row>
             </v-card>
             <v-dialog v-model="loadingDialog" hide-overlay persistent width="300">
               <v-card color="teal" dark>
@@ -169,7 +167,8 @@ export default{
                     {
                         text:'Customers',
                         disabled:false,
-                        to:'/customers/list'
+                        to:'/customers',
+                        exact:true,
                     },
                     {
                         text:'Add',

@@ -12,7 +12,7 @@ use Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use TorMorten\Eventy\Facades\Events as Eventy;
+use App\Imports\CustomerImport;
 class CustomerController extends Controller
 {
 	protected $searcheable =['name'];
@@ -37,13 +37,23 @@ class CustomerController extends Controller
         $headers=[];
         $select_array = ['id','name','email'];
         $list_terms = helper('apex')->get_list_terms($request,'customer',$select_array,$this->searcheable);
+        $data = Customer::select($select_array);
+        if($request->pending)
+        {
+            $data = $data->where('publish',0);
+        }
+        elseif($request->tally)
+        {
+            $data = $data->where('tally',0)->where('publish',1);
+        }
+        else
+        {
+            $data = $data->where('publish',1);
+        }
         if($request->get('search')){
-            $data = Customer::where($list_terms['search'])->get();
+            $data = $data->where($list_terms['search']);
         }
-        else{
-            $data = Customer::all();
-        }
-        $list = helper('apex')->perform_filtering($data,$list_terms['rpp'],$list_terms['page'],$select_array,$request,'customer',Customer::class);
+        $list = helper('apex')->perform_filtering($data,$select_array,$request,'customer',Customer::class);
         return response()->json(
             [
                 'items'=>$list['items'],
@@ -58,12 +68,34 @@ class CustomerController extends Controller
             ]
         );
     }
+    public function search(Request $request)
+    {
+        $select_array = ['id','name'];
+        $data = Customer::select($select_array);
+        $data = $data->where('publish',1);
+        if($request->get('search')){
+            $data = $data->where('name', 'like', '%'.$request->get('search').'%');
+        }
+        $data = $data->limit(15)->get();
+        $items = [];
+        foreach ($data as $obj) {
+            $items[] = [
+                'text' => $obj->name,
+                'value' => $obj->id,
+            ];
+        }
+        return response()->json(
+            [
+                'items' => $items
+            ]
+        );
+    }
     public function save(Request $request)
     {
     	$arr = json_decode($request->data,true);
     	$validator = Validator::make($arr, [
     		'name.value'=>'required|unique:customers,name',
-    		'email.value'=>'required|email|unique:customers,email',
+    		//'email.value'=>'required|email|unique:customers,email',
     		'phones.*.value'=>'nullable|integer',
     		'addresses.*.tag.value'=>'required',
     	]);
@@ -154,7 +186,7 @@ class CustomerController extends Controller
     	$arr = json_decode($request->data,true);
     	$validator = Validator::make($arr, [
     		'name.value'=>'required|unique:customers,name,'.$id,
-    		'email.value'=>'required|email|unique:customers,email,'.$id,
+    		//'email.value'=>'required|email|unique:customers,email,'.$id,
     		'phones.*.value'=>'nullable|integer',
     		'addresses.*.tag.value'=>'required',
     	]);
@@ -205,5 +237,41 @@ class CustomerController extends Controller
         return response()->json([
             'message'=>'success',
         ]);
+    }
+    public function import(Request $request)
+    {
+        //dd($request->toArray());
+        $file = $request->file('file');
+        $method = $request->method;
+        //dd($file->extension());
+        if($file->extension() != 'xlsx' && $file->extension() != 'zip')
+        {
+            return response()->json([
+                'status' => 'file_failed',
+                'message' => 'Error: The uploaded file is not valid. Please try again'
+            ]);
+        }
+        else{
+            try {
+                $import = new CustomerImport($method);
+                $import->import($request->file('file'));
+            } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+
+                 $failures = $e->failures();
+                
+                 foreach ($failures as $failure) {
+                    $msg = $failure->errors();
+                    $messages[$failure->row()][$failure->attribute()]['message'] = $msg[0];
+                 }
+                 return response()->json([
+                    'status' => 'failed',
+                    'messages' => $messages
+                ]);
+            }
+           return response()->json([
+                'status' => 'success',
+                'message' => 'Import Completed successfully'
+            ]);
+        }
     }
 }

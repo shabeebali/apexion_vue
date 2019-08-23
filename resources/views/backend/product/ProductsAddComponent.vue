@@ -8,22 +8,18 @@
                 <v-toolbar-title>Add Product</v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-btn tile color="primary" @click="add">Add</v-btn>
-                <template v-slot:extension>
-                    <v-tabs v-model="tab" color="primary" grow slider-color="yellow" background-color="transparent">
-                        <v-tab v-for="(head,key) in tabHeads" :key="key">
-                            <v-badge right v-if="head.error" color="white">
-                                <template v-slot:badge>
-                                    <v-icon color="red" sm=all>error</v-icon>
-                                </template>
-                                <span>{{ key }}</span>
-                            </v-badge>
-                            <span v-else>{{ key }}</span>
-                        </v-tab>
-                    </v-tabs>
-                </template>
             </v-toolbar>
             <v-card>
-                <v-tabs-items v-model="tab">
+                <v-tabs v-model="tab" vertical dark background-color="primary">
+                    <v-tab v-for="(head,key) in tabHeads" :key="key">
+                        <v-badge right v-if="head.error" color="white">
+                            <template v-slot:badge>
+                                <v-icon color="red" sm=all>error</v-icon>
+                            </template>
+                            <span>{{ key }}</span>
+                        </v-badge>
+                        <span v-else>{{ key }}</span>
+                    </v-tab>
                     <v-tab-item>
                         <v-card class="pa-4" flat>
                             <v-row row wrap>
@@ -117,7 +113,7 @@
                             </v-row>
                         </v-card>
                     </v-tab-item>
-                </v-tabs-items>
+                </v-tabs>
                 <v-row class="mx-0" justify="end">
                     <v-col md="auto" class="text-xs-right">
                         <v-btn tile color="primary" @click="add">Add</v-btn>

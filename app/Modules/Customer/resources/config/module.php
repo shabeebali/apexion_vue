@@ -1,7 +1,7 @@
 <?php
 return [
 	'menu' => [
-        'route' => '/customers/list',
+        'route' => '/customers/',
         'name' => 'Customers',
         'icon' => 'people',
         'permission' => 'list_customers'

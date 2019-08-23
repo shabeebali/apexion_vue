@@ -67,6 +67,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::get('products/pricelist/edit/{id}','Backend\ProductController@edit_pricelist');
     Route::post('products/pricelist/edit/{id}','Backend\ProductController@update_pricelist');
     Route::post('products/pricelist/delete','Backend\ProductController@delete_pricelist');
+    Route::get('products/search','Backend\ProductController@search');
     // Categories
     Route::get('products/categories','Backend\TaxonomyController@index');
     Route::get('products/categories/export','Backend\TaxonomyController@export');
@@ -86,6 +87,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::post('products/code_order','Backend\TaxonomyController@save_code_order');
     Route::get('products/categories/types','Backend\TaxonomyController@types');
 
+
     //Customer
 
     Route::get('customers','Backend\CustomerController@index');
@@ -93,11 +95,17 @@ Route::middleware(['auth:api'])->group(function(){
     Route::post('customers/add','Backend\CustomerController@save');
     Route::post('customers/delete','Backend\CustomerController@delete');
     Route::get('customers/edit/{id}','Backend\CustomerController@edit');
+    Route::get('customers/search','Backend\CustomerController@search');
+    Route::post('customers/import','Backend\CustomerController@import');
     Route::post('customers/edit/{id}','Backend\CustomerController@update');
     //Warehouse
 
     Route::get('products/warehouses','Backend\WarehouseController@index');
     Route::post('products/warehouse/add','Backend\WarehouseController@save');
     Route::post('logout','Auth\LoginController@logout');
+
+    //Sale
+    Route::get('sale/get_menu','Backend\SaleController@getMenu');
+    Route::get('sale/orders','Backend\SaleController@index');
 });
 Route::post('login','Auth\LoginController@login');

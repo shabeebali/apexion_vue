@@ -47,19 +47,21 @@
                     {
                         text:'Customers',
                         disabled:true,
-                        to:'/customers/list'
+                        to:'/customers/',
+                        exact:true
                     },
                 ]
             }
         },
         mounted(){
+
         },
         methods:{
             editItem($event){
-                this.$router.push('edit/'+$event)
+                this.$router.push('/customers/edit/'+$event)
             },
             redirectAdd(){
-                this.$router.push('add')
+                this.$router.push('/customers/add')
             }
         }
     }

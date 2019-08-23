@@ -122,6 +122,28 @@ class ProductController extends Controller
             'count'=> $user->can('sync_tally') ? Product::where([['tally','=',0],['publish','=',1]])->get()->count() : 0
         ]);
     }
+    public function search(Request $request)
+    {
+        $select_array = ['id','name'];
+        $data = Product::select($select_array);
+        $data = $data->where('publish',1);
+        if($request->get('search')){
+            $data = $data->where('name', 'like', '%'.$request->get('search').'%');
+        }
+        $data = $data->limit(15)->get();
+        $items = [];
+        foreach ($data as $obj) {
+            $items[] = [
+                'text' => $obj->name,
+                'value' => $obj->id,
+            ];
+        }
+        return response()->json(
+            [
+                'items' => $items
+            ]
+        );
+    }
     public function view(Request $request,$id)
     {
         $category_types = CategoryType::all();

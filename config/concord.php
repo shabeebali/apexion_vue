@@ -7,6 +7,7 @@ return [
         App\Modules\ProductCode\Providers\ModuleServiceProvider::class,
         App\Modules\Settings\Providers\ModuleServiceProvider::class,
         App\Modules\Taxonomy\Providers\ModuleServiceProvider::class,
+        App\Modules\Sale\Providers\ModuleServiceProvider::class,
         Konekt\Acl\Providers\ModuleServiceProvider::class,
     ]
 ];

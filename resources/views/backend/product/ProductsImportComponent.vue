@@ -14,7 +14,7 @@
 								<v-file-input label="Click Here to select file.." persistent-hint hint="Please upload Excel file (.xslx) only" @change="update"></v-file-input>
 							</v-col>
 							<v-col class="col-2">
-								<v-select label="Method" :items="methods" v-model="method" :error-messages="method_error"></v-select>
+								<v-select label="Method" :items="items" v-model="method" ></v-select>
 							</v-col>
 							<v-col class="col-2" >
 								<v-row>

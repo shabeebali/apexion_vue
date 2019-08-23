@@ -4,76 +4,72 @@
             <v-breadcrumbs :items="breadcrumbs" divider=">"></v-breadcrumbs>
         </div>
         <v-container fluid class="pt-0">
-            <v-toolbar color="white" light tabs>
-                <v-toolbar-title>Edit Product: {{formdata.name.value}}</v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-btn tile color="primary" @click="update">Update</v-btn>
-                <template v-slot:extension>
-                    <v-tabs v-model="tab" color="primary" grow slider-color="yellow" background-color="transparent">
-                        <v-tab v-for="(head,key) in tabHeads" :key="key">
-                            <v-badge right v-if="head.error" color="white">
-                                <template v-slot:badge>
-                                    <v-icon color="red" sm=all>error</v-icon>
-                                </template>
-                                <span>{{ key }}</span>
-                            </v-badge>
-                            <span v-else>{{ key }}</span>
-                        </v-tab>
-                    </v-tabs>
-                </template>
-            </v-toolbar>
             <v-card>
-                <v-tabs-items v-model="tab">
+                <v-toolbar color="white" light tabs>
+                    <v-toolbar-title>Edit Product: {{formdata.name.value}}</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-btn tile color="primary" @click="update">Update</v-btn>
+                </v-toolbar>
+                <v-tabs vertical v-model="tab" background-color="primary" dark>
+                    <v-tab v-for="(head,key) in tabHeads" :key="key">
+                        <v-badge right v-if="head.error" color="white">
+                            <template v-slot:badge>
+                                <v-icon color="red" sm=all>error</v-icon>
+                            </template>
+                            <span>{{ key }}</span>
+                        </v-badge>
+                        <span v-else>{{ key }}</span>
+                    </v-tab>
                     <v-tab-item>
                         <v-card class="pa-4" flat>
                             <v-row row wrap>
-                                <v-col cols=12 px-2>
+                                <v-col cols=12 class="px-2">
                                     <v-text-field label="Name" v-model="formdata.name.value" :error-messages="formdata.name.error"></v-text-field>
                                 </v-col>
                             </v-row>
                             <v-row row wrap>
-                                <v-col lg=3 md=6 cols=12 px-2>
+                                <v-col lg=3 md=6 cols=12 class="px-2">
                                     <v-text-field label="HSN Code" v-model="formdata.hsn.value" type="text"></v-text-field>
                                 </v-col>
-                                <v-col lg=3 md=6 cols=12 px-2>
+                                <v-col lg=3 md=6 cols=12 class="px-2">
                                     <v-text-field label="Weight" v-model="formdata.weight.value" type="text" :error-messages="formdata.weight.error"></v-text-field>
                                 </v-col>
-                                <v-col lg=3 md=6 cols=12 px-2>
+                                <v-col lg=3 md=6 cols=12 class="px-2">
                                     <v-select label="GST" :items="formdata.gst.options" v-model="formdata.gst.value" ></v-select>
                                 </v-col>
-                                <v-col lg=3 md=6 cols=12 px-2>
+                                <v-col lg=3 md=6 cols=12 class="px-2">
                                         <v-text-field label="MRP" v-model="formdata.mrp.value" type="text" :error-messages="formdata.mrp.error"></v-text-field>
                                 </v-col>
-                                <v-col lg=3 md=6 cols=12 px-2>
+                                <v-col lg=3 md=6 cols=12 class="px-2">
                                     <v-text-field label="Landing Price" v-model="formdata.landing_price.value" type="text" :error-messages="formdata.landing_price.error"></v-text-field>
                                 </v-col>
-                                <v-col lg=3 md=6 cols=12 px-2>
+                                <v-col lg=3 md=6 cols=12 class="px-2">
                                     <v-text-field label="General Selling Price" v-model="formdata.general_selling_price.value" type="text" :error-messages="formdata.general_selling_price.error"></v-text-field>
                                 </v-col>
-                                <v-col lg=3 md=6 cols=12 px-2>
+                                <v-col lg=3 md=6 cols=12 class="px-2">
                                     <v-text-field label="General Selling Price (Dealer)" v-model="formdata.general_selling_dealer.value" type="text" :error-messages="formdata.general_selling_dealer.error"></v-text-field>
                                 </v-col>
-                                <v-col lg=3 md=6 cols=12 px-2 v-for="(item,i)  in npc_category_types" :key="i">
+                                <v-col lg=3 md=6 cols=12 class="px-2" v-for="(item,i)  in npc_category_types" :key="i">
                                     <v-select :label="item.label" :items="item.options" v-model="item.value" :error-messages="item.error"></v-select>
                                 </v-col>
                             </v-row>
                             <v-row row wrap>
-                                <v-col cols=12 px-2>
+                                <v-col cols=12 class="px-2">
                                     <v-textarea label="Remarks" v-model="formdata.remarks.value"></v-textarea>
                                 </v-col>
                             </v-row>
                             <v-row row wrap>
-                                <v-col cols=12 px-2>
+                                <v-col cols=12 class="px-2">
                                     <v-textarea label="Description" v-model="formdata.description.value"></v-textarea>
                                 </v-col>
                             </v-row>
                             <v-row row wrap v-if="pendingFlag">
-                                <v-col cols=12 px-2>
+                                <v-col cols=12 class="px-2">
                                     <v-switch v-model="formdata.pending.value" true-value="1" false-value="0" label="Approved?"></v-switch>
                                 </v-col>
                             </v-row>
                             <v-row row wrap v-if="tallFlag">
-                                <v-col cols=12 px-2>
+                                <v-col cols=12 class="px-2">
                                     <v-switch v-model="formdata.tally.value" true-value="1" false-value="0" label="Synced with Tally?"></v-switch>
                                 </v-col>
                             </v-row>
@@ -96,11 +92,11 @@
                     <v-tab-item >
                         <v-card class="pa-4" flat v-if="Object.keys(pricelist).length > 0">
                             <v-row row wrap v-for="(p,index) in pricelist" :key="index">
-                                <v-col lg=3 md=4 sm=4 cols=6 px-2>
+                                <v-col lg=3 md=4 sm=4 cols=6 class="px-2">
                                     <v-text-field :label="p.name+' price margin (%)'" v-model="pricelist[index].value" 
                                     @input="updatePricelist(index)"></v-text-field>
                                 </v-col>
-                                <v-col lg=3 md=4 sm=4 cols=6 px-2>
+                                <v-col lg=3 md=4 sm=4 cols=6 class="px-2">
                                     <v-text-field label="price" 
                                     :value="calculated_price(pricelist[index].value)"
                                     readonly 
@@ -112,13 +108,13 @@
                     <v-tab-item >
                         <v-card class="pa-4" flat v-if="Object.keys(warehouse).length > 0">
                             <v-row row wrap v-for="(p,index) in warehouse" :key="index">
-                                <v-col lg=3 md=4 sm=4 cols=6 px-2>
+                                <v-col lg=3 md=4 sm=4 cols=6 class="px-2">
                                     <v-text-field :label="'Warehouse: '+p.name" :error-messages="p.error" v-model="warehouse[index].value"></v-text-field>
                                 </v-col>
                             </v-row>
                         </v-card>
                     </v-tab-item>
-                </v-tabs-items>
+                </v-tabs>
                 <v-row class="mx-0" justify="end">
                     <v-col md="auto" class="text-xs-right">
                         <v-btn tile color="primary" @click="update">Update</v-btn>

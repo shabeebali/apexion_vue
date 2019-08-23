@@ -29,6 +29,13 @@ import CustomerIndex from '../views/backend/customer/CustomerIndexComponent.vue'
 import CustomerList from '../views/backend/customer/CustomerListComponent.vue'
 import CustomerAdd from '../views/backend/customer/CustomerAddComponent.vue'
 import CustomerEdit from '../views/backend/customer/CustomerEditComponent.vue'
+import CustomerImport from '../views/backend/customer/CustomerImportComponent.vue'
+
+import SaleIndex from '../views/backend/sale/SaleIndexComponent.vue'
+import OrderIndex from '../views/backend/sale/OrderIndexComponent.vue'
+import OrderList from '../views/backend/sale/OrderListComponent.vue'
+import OrderAdd from '../views/backend/sale/OrderAddComponent.vue'
+import OrderEdit from '../views/backend/sale/OrderEditComponent.vue'
 export const routes=[
 
     {
@@ -149,14 +156,14 @@ export const routes=[
                 path:'settings',
                 component:ProductsSettings,
             },
-],
+        ],
     },
     {
         path:'/customers',
         component:CustomerIndex,
         children:[
             {
-                path:'list',
+                path:'/',
                 component:CustomerList,
             },
             {
@@ -166,6 +173,34 @@ export const routes=[
             {
                 path:'edit/:id',
                 component:CustomerEdit,
+            },
+            {
+                path:'import',
+                component:CustomerImport,
+            },
+        ],
+    },
+    {
+        path:'/sale',
+        component:SaleIndex,
+        children:[
+            {
+                path:'orders',
+                component:OrderIndex,
+                children:[
+                    {
+                        path:'/',
+                        component:OrderList,
+                    },
+                    {
+                        path:'add',
+                        component:OrderAdd,
+                    },
+                    {
+                        path:'edit/:id',
+                        component:OrderEdit,
+                    },
+                ]
             },
         ],
     },
