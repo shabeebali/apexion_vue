@@ -75,7 +75,7 @@ class SaleController extends Controller
 			$date = new Carbon($obj->created_at);
 			$items[] = [
 				'order_id'=>$obj->id,
-				'customer'=>$obj->customer->name,
+				'customer'=>($obj->customer_id == 0 ? '' : $obj->customer->name),
 				'status'=>$obj->status,
 				'created_by'=>$obj->user->name,
 				'date'=>$date->toFormattedDateString(),
@@ -116,6 +116,27 @@ class SaleController extends Controller
             ]
         );
 	}
+	public function users()
+	{
+		$objs = \App\User::all();
+		$current_user = \Auth::user();
+		$users = [];
+		foreach ($objs as $obj) {
+			if($obj->hasRole('sale'))
+			{
+				$users[] = [
+					'text' => $obj->name,
+					'value' => $obj->id,
+					'default' => $obj->id == $current_user->id ? 1: 0
+				];
+			}
+		}
+		return response()->json(
+            [
+                'users'=>$users,
+            ]
+        );
+	}
 	public function getRate(Request $request)
 	{
 		$obj = Product::find($request->id);
@@ -132,13 +153,29 @@ class SaleController extends Controller
 	{
 
 		$user = \Auth::user();
-		$order = new Order;
-		$order->user_id = $user->id;
-		$order->status = 'processing';
-		$order->customer_id = $request->customer_id;
+		if($request->draft_id != 0)
+		{
+			$order = Order::find($request->draft_id);
+		}
+		else{
+			$order = new Order;
+		}
+		$order->user_id = $request->created_by;
+		$order->status = $request->status;
+		$order->pricelist_id = $request->pricelist_id;
+		$order->gsl_included = $request->gst_included;
+		$order->salesperson_id = $request->salesperson;
+		$order->customer_id = ($request->customer_id == 'undefined' ? 0:$request->customer_id) ;
 		$order->discount = $request->discount;
 		$order->total = $request->total;
 		$order->save();
+		if($request->draft_id != 0)
+		{
+			$items = $order->items()->get();
+			foreach ($items as $item) {
+				OrderItems::destroy($item->id);
+			}
+		}
 		$items = json_decode($request->items,true);
 		foreach ($items as $item) {
 			$order_items = new OrderItems;
@@ -151,7 +188,8 @@ class SaleController extends Controller
 		}
 		return response()->json(
             [
-                'message' => 'success'
+                'message' => 'success',
+                'draft_id'=> $order->id,
             ]
         );
 	}

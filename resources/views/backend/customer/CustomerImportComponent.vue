@@ -55,9 +55,9 @@
                         to:'/'
                     },
                     {
-                        text:'Cusotmers',
+                        text:'Customers',
                         disabled:false,
-                        to:'/cusotmers',
+                        to:'/customers',
                         exact:true,
                     },
                     {

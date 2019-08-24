@@ -15,7 +15,11 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->bigInteger('ref')->nullable();
             $table->bigInteger('user_id')->nullable();
+            $table->bigInteger('salesperson_id')->nullable();
+            $table->bigInteger('pricelist_id')->nullable();
+            $table->boolean('gst_included');
             $table->string('status')->default('processing');
             $table->bigInteger('customer_id')->nullable();
             $table->decimal('discount',8,2)->default(0.00);

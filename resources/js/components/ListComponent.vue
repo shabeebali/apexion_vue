@@ -172,7 +172,8 @@
                 </template>
                 <template v-slot:item.status="{ item }">
                     <div v-if="item.status == 'processing'" class="red--text">{{item.status}}</div>
-                    <div v-else class="green--text">{{item.status}}</div>
+                    <div v-if="item.status == 'draft'" class="cyan--text">{{item.status}}</div>
+                    <div v-if="item.status == 'completed'" class="green--text">{{item.status}}</div>
                 </template>
                 <template v-slot:item.actions="{ item }">
                     <v-tooltip bottom v-if="item.actions.edit">
