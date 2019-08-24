@@ -30,8 +30,12 @@
     },
     "dependencies": {
         "@mdi/js": "^4.1.95",
+        "chart.js": "^2.8.0",
         "laravel-echo": "^1.5.4",
         "pusher-js": "^4.4.0",
+        "vue-chartjs": "^3.4.2",
+        "vue-google-charts": "^0.3.2",
+        "vue-graph": "^0.8.5",
         "vue-router": "^3.1.2",
         "vue-spinner": "^1.0.3",
         "vuedraggable": "^2.23.0",
