@@ -396,7 +396,7 @@ export default{
         save(){
             this.routerCheck = false
             var fD = new FormData()
-            fD.append('customer_id',this.customerSelect)
+            fD.append('customer_id',this.customerSelect.value)
             fD.append('items',JSON.stringify(this.items))
             fD.append('discount',this.discount)
             fD.append('total',this.total)
