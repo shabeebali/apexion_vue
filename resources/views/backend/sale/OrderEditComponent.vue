@@ -288,6 +288,11 @@ export default{
                 this.updateTotal()
             }
         },
+        freight:{
+            handler(){
+                this.updateTotal()
+            }
+        },
         gstSwitch:{
             handler(){
                 this.setRate() 
