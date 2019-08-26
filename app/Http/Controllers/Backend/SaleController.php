@@ -38,16 +38,18 @@ class SaleController extends Controller
     }
 	public function index(Request $request)
 	{
+		
 		$user = \Auth::user();
 		$objs = Order::orderBy('id','desc');
 		if($request->search)
 		{
+			
 		}
 		$objs=$objs->get();
 		$headers = [
 			[
-				'text'=>'Order ID',
-				'value' => 'order_id'
+				'text'=>'Ref',
+				'value' => 'ref'
 			],
 			[
 				'text'=>'Customer',
@@ -74,7 +76,7 @@ class SaleController extends Controller
 		foreach ($objs as $obj) {
 			$date = new Carbon($obj->created_at);
 			$items[] = [
-				'order_id'=>$obj->id,
+				'ref'=>$obj->ref,
 				'customer'=>($obj->customer_id == 0 ? '' : $obj->customer->name),
 				'status'=>$obj->status,
 				'created_by'=>$obj->user->name,
@@ -151,23 +153,53 @@ class SaleController extends Controller
 	}
 	public function save(Request $request)
 	{
+		//dd($request->draft_id);
 
 		$user = \Auth::user();
-		if($request->draft_id != 0)
+		if($request->draft_id != '0')
 		{
 			$order = Order::find($request->draft_id);
 		}
 		else{
 			$order = new Order;
 		}
+		//dd($order);
 		$order->user_id = $request->created_by;
 		$order->status = $request->status;
 		$order->pricelist_id = $request->pricelist_id;
-		$order->gsl_included = $request->gst_included;
+		$order->gst_included = $request->gst_included;
 		$order->salesperson_id = $request->salesperson;
+		$order->freight = $request->freight;
 		$order->customer_id = ($request->customer_id == 'undefined' ? 0:$request->customer_id) ;
 		$order->discount = $request->discount;
 		$order->total = $request->total;
+		$order->tax = $request->tax;
+		$count = 0;
+		$ref_num = Carbon::now();
+		$ref_num = $ref_num->format('ymd');
+		$ref_num = $ref_num.str_pad($count, 3,0,STR_PAD_LEFT);
+		
+		$data['ref_num']= $ref_num;
+		if($request->draft_id != '0')
+		{
+			
+	        while(Validator::make($data,['ref_num'=>'unique:orders,ref,'.$request->draft_id])->fails()){
+	            $ref_num = substr($ref_num, 0, -3);
+	            $count = $count + 1;
+	            $ref_num = $ref_num.str_pad($count, 3,0,STR_PAD_LEFT);
+	            $data['ref_num']= $ref_num;
+	        }
+		}
+		else
+		{
+			while(Validator::make($data,['ref_num'=>'unique:orders,ref'])->fails()){
+	            $ref_num = substr($ref_num, 0, -3);
+	            $count = $count + 1;
+	            $ref_num = $ref_num.str_pad($count, 3,0,STR_PAD_LEFT);
+	            $data['ref_num']= $ref_num;
+	        }
+	    }
+        $order->ref = $ref_num;
 		$order->save();
 		if($request->draft_id != 0)
 		{
@@ -184,6 +216,7 @@ class SaleController extends Controller
 			$order_items->rate = $item['rate'];
 			$order_items->quantity = $item['qty'];
 			$order_items->order_id = $order->id;
+			$order_items->gst = $item['gst'];
 			$order_items->save();
 		}
 		return response()->json(
@@ -216,7 +249,9 @@ class SaleController extends Controller
 			$items[] =[
 				'line' => $count,
 				'product' => Product::find($order_item->product_id)->name,
+
 				'qty' => $order_item->quantity,
+				'gst' => $order_item->gst,
 				'rate' => $order_item->rate,
 				'price' => $order_item->price,
 			];
@@ -224,11 +259,54 @@ class SaleController extends Controller
 		}
 		return response()->json(
             [
-            	'order_id'=>$order->id,
+            	'status'=> $order->status,
+            	'id' => $order->id,
+            	'freight' => $order->freight,
+            	'created_by' => \App\User::find($order->user_id)->name,
+            	'salesperson' => \App\User::find($order->salesperson_id)->name,
+            	'ref'=>$order->ref,
                 'items'=>$items,
-                'customer'=>Customer::find($order->customer_id)->name,
+                'customer'=> ($order->customer_id == 0 ? '': Customer::find($order->customer_id)->name),
                 'discount'=>$order->discount,
+                'tax' => $order->tax,
+                'gst_included' => $order->gst_included,
                 'total' => $order->total,
+                'pricelist' => Pricelist::find($order->pricelist_id)->name
+            ]
+        );
+	}
+	public function edit(Request $request, $id)
+	{
+		$order = Order::find($id);
+		$order_items = $order->items()->get();
+		$count = 1;
+		$items = [];
+		foreach($order_items as $order_item)
+		{
+			$items[] =[
+				'line' => $count,
+				'product' => Product::find($order_item->product_id)->name,
+				'id' => $order_item->product_id,
+				'qty' => $order_item->quantity,
+				'gst' => $order_item->gst,
+				'rate' => $order_item->rate,
+				'price' => $order_item->price,
+			];
+			$count = $count+1;
+		}
+		return response()->json(
+            [
+            	'status'=> $order->status,
+            	'draft_id' => $order->id,
+            	'user_id' => $order->user_id,
+            	'salesperson_id' => $order->salesperson_id,
+            	'freight' => $order->freight,
+                'items'=>$items,
+                'customer'=>($order->customer_id == 0 ? '': Customer::find($order->customer_id)->name),
+                'customer_id'=> $order->customer_id,
+                'pricelist_id'=> $order->pricelist_id,
+                'discount'=>$order->discount,
+                'gst_included' => $order->gst_included,
             ]
         );
 	}

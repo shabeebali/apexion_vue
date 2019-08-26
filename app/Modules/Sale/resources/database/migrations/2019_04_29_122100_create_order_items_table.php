@@ -18,6 +18,7 @@ class CreateOrderItemsTable extends Migration
             $table->bigInteger('order_id');
             $table->bigInteger('product_id');
             $table->bigInteger('quantity')->default(1);
+            $table->decimal('gst',8,2)->default(0.00);
             $table->decimal('rate',8,2)->default(0.00);
             $table->decimal('price',8,2)->default(0.00);
         });

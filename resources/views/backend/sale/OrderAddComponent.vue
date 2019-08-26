@@ -13,7 +13,7 @@
             <v-card>
                 <v-row class="mx-0" justify="space-between">
                     <v-col cols=6>
-                        <v-autocomplete
+                        <v-combobox
                           v-model="customerSelect"
                           :loading="customerLoading"
                           :items="customerItems"
@@ -25,7 +25,7 @@
                           hide-no-data
                           hide-details
                           label="Customer"
-                        ></v-autocomplete>
+                        ></v-combobox>
                     </v-col>
                     <v-col cols=3>
                         <v-select v-model="pricelistSelect" :items="pricelist_items" label="Pricelist"></v-select>
@@ -85,7 +85,7 @@
                                             <td><v-text-field class="text-right" style="direction:rtl;" v-model="qty"></v-text-field></td>
                                             <td><v-text-field class="text-right" style="direction:rtl;" :loading="rateLoading" v-model="rate"></v-text-field></td>
                                             <td><v-text-field class="text-right" style="direction:rtl;" readonly :value="gst+'%'"></v-text-field></td>
-                                            <td><v-text-field class="text-right" style="direction:rtl;" readonly :rules="[rules.decimal]" :value="parseInt(qty)*parseFloat(rate)"></v-text-field></td>
+                                            <td><v-text-field class="text-right" style="direction:rtl;" readonly :rules="[rules.decimal]" :value="(parseInt(qty)*parseFloat(rate)).toFixed(2)"></v-text-field></td>
 
                                             <td><v-btn icon rounded small :disabled="productSelect == null || isNaN(parseInt(qty)*parseFloat(rate))" @click.stop="addLine"><v-icon>mdi-plus-circle</v-icon></v-btn></td>
                                         </tr>
@@ -93,20 +93,31 @@
                                             <td></td>
                                             <td></td>
                                             <td></td>
+                                            <td></td>
                                             <td class="text-right">Tax</td>
-                                            <td><v-text-field readonly class="text-end" style="direction:rtl;" v-model="tax"></v-text-field></td>
+                                            <td><v-text-field readonly class="text-end" style="direction:rtl;" v-model="tax" append-icon="mdi-plus"></v-text-field></td>
                                             <td></td>
                                         </tr>
                                         <tr>
                                             <td></td>
                                             <td></td>
                                             <td></td>
-                                            
+                                            <td></td>
                                             <td class="text-right">Discount</td>
                                             <td><v-text-field class="text-end" style="direction:rtl;" v-model="discount" append-icon="mdi-minus"></v-text-field></td>
                                             <td></td>
                                         </tr>
                                         <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td class="text-right">Freight</td>
+                                            <td><v-text-field class="text-end" style="direction:rtl;" v-model="freight" append-icon="mdi-plus"></v-text-field></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
                                             <td></td>
                                             <td></td>
                                             <td></td>
@@ -132,7 +143,9 @@
 export default{
     data(){
         return{ 
+            routerCheck:true,
             tax:0,
+            freight:0,
             gstSwitch:'1',
             draftId:0,
             timeout:2000,
@@ -200,12 +213,17 @@ export default{
         })
     },
     beforeRouteLeave (to, from, next) {
-        const answer = window.confirm('Do you really want to leave? your unsaved changes will be lost!')
-        if (answer) {
+        if(this.routerCheck){
+            const answer = window.confirm('Do you really want to leave? your unsaved changes will be lost!')
+            if (answer) {
+                next()
+            } 
+            else {
+                next(false)
+            }
+        }
+        else{
             next()
-        } 
-        else {
-            next(false)
         }
     },
     watch: {
@@ -287,12 +305,20 @@ export default{
             this.updateTotal()
         },
         create(){
+            this.routerCheck = false
             var fD = new FormData()
-            fD.append('customer_id',this.customerSelect)
+            fD.append('customer_id',this.customerSelect.value)
             fD.append('items',JSON.stringify(this.items))
             fD.append('discount',this.discount)
             fD.append('total',this.total)
+            fD.append('freight',this.freight)
             fD.append('status','processing')
+            fD.append('draft_id',this.draftId)
+            fD.append('created_by',this.userSelect)
+            fD.append('pricelist_id',this.pricelistSelect)
+            fD.append('salesperson',this.salesPersonSelect)
+            fD.append('gst_included',this.gstSwitch)
+            fD.append('tax',this.tax)
             axios.post('sale/orders/add',fD).then((response)=>{
                 if(response.status == 200){
                     this.$router.push('/sale/orders')
@@ -304,13 +330,19 @@ export default{
         },
         updateTotal(){
             var temp = 0;
+            var temp2 = 0
             Object.keys(this.items).forEach((key)=>{
                 temp = parseFloat(temp)+parseFloat(this.items[key].price)
-                temp2 = (parseFloat(this.items[key].price)*(parseFloat(this.gst)/100)).toFixed(2)
+                temp2 = (parseFloat(this.items[key].price)*(parseFloat(this.items[key].gst)/100)).toFixed(2)
             })
-
-            this.tax = parseFloat(temp2)
-            this.total = parseFloat(temp)+parseFloat(temp2)-parseFloat(this.discount)
+            console.log(temp2)
+            this.tax = temp2
+            if(this.gstSwitch === '0'){
+                this.total = (parseFloat(temp)+parseFloat(temp2)-parseFloat(this.discount)+parseFloat(this.freight)).toFixed(2)
+            }
+            else{
+                this.total = (parseFloat(temp)-parseFloat(this.discount)+parseFloat(this.freight)).toFixed(2)
+            }
         },
         updateBill(){
             if(this.items.length > 0){
@@ -320,13 +352,16 @@ export default{
                             var gst = response.data.gst
                             var landing_price = response.data.landing_price
                             var value = response.data.value
+                            this.gst = response.data.gst
+                            this.items[key].gst = response.data.gst
                             if(this.gstSwitch === '0'){
                                 this.items[key].rate = (parseFloat(landing_price)*((parseFloat(value)/100)+1)).toFixed(2)
                             }
                             else {
-                                this.items[key].rate = ((parseFloat(landing_price)*((parseFloat(value)/100)+1))*((parseFloat(gst)/100)+1)).toFixed(2)
+                                this.items[key].rate = (((parseFloat(landing_price)*((parseFloat(value)/100)+1)).toFixed(2)
+)*((parseFloat(gst)/100)+1)).toFixed(2)
                             }
-                            this.items[key].price = parseFloat(this.items[key].rate)*parseInt(this.items[key].qty)
+                            this.items[key].price = (parseFloat(this.items[key].rate)*parseInt(this.items[key].qty)).toFixed(2)
                             this.updateTotal()
                         }
                     })
@@ -347,7 +382,8 @@ export default{
                             this.rate = (parseFloat(landing_price)*((parseFloat(value)/100)+1)).toFixed(2)
                         }
                         else {
-                            this.rate = ((parseFloat(landing_price)*((parseFloat(value)/100)+1))*((parseFloat(gst)/100)+1)).toFixed(2)
+                            this.rate = (((parseFloat(landing_price)*((parseFloat(value)/100)+1)).toFixed(2)
+)*((parseFloat(gst)/100)+1)).toFixed(2)
                         }
                         this.rateLoading = false
                     }
@@ -358,11 +394,13 @@ export default{
             }
         },
         save(){
+            this.routerCheck = false
             var fD = new FormData()
             fD.append('customer_id',this.customerSelect)
             fD.append('items',JSON.stringify(this.items))
             fD.append('discount',this.discount)
             fD.append('total',this.total)
+            fD.append('freight',this.freight)
             fD.append('status','draft')
             fD.append('draft_id',this.draftId)
             fD.append('created_by',this.userSelect)
@@ -374,6 +412,7 @@ export default{
                 if(response.status == 200){
                     this.draftId = response.data.draft_id
                     this.snackbar = true
+                    this.routerCheck = true
                 }
                 else{
                     alert('Something went wrong!')

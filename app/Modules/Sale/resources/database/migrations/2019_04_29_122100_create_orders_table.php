@@ -22,7 +22,10 @@ class CreateOrdersTable extends Migration
             $table->boolean('gst_included');
             $table->string('status')->default('processing');
             $table->bigInteger('customer_id')->nullable();
+            $table->decimal('weight',8,2)->default(0.00);
+            $table->decimal('freight',8,2)->default(0.00);
             $table->decimal('discount',8,2)->default(0.00);
+            $table->decimal('tax',8,2)->default(0.00);
             $table->decimal('total',8,2)->default(0.00);
             $table->timestamps();
         });

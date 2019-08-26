@@ -112,6 +112,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::get('sale/orders/getpl','Backend\SaleController@getPl');
     Route::get('sale/orders/users','Backend\SaleController@users');
     Route::get('sale/orders/getrate','Backend\SaleController@getRate');
+    Route::get('sale/orders/edit/{id}','Backend\SaleController@edit');
     Route::post('sale/orders/complete','Backend\SaleController@complete');
 });
 Route::post('login','Auth\LoginController@login');
