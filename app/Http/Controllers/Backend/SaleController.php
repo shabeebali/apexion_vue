@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use App\Http\Controllers\Controller;
 use App\Modules\Product\Models\Product;
 use App\Modules\Product\Models\Pricelist;
@@ -40,12 +41,22 @@ class SaleController extends Controller
 	{
 		
 		$user = \Auth::user();
-		$objs = Order::orderBy('id','desc');
+		$objs = Order::select('id','ref','status','created_at','customer_id','user_id');
 		if($request->search)
 		{
-			
+			$objs = $objs->whereHas('customer', function ($query) use ($request){
+			    $query->where('name', 'like', '%'.$request->search.'%');
+			});
 		}
-		$objs=$objs->get();
+		if($request->sortby){
+			$objs = $objs->orderBy($request->sortby,($request->descending ? 'desc':'asc'));
+		}
+		else{
+			$objs = $objs->orderBy('id','desc');
+		}
+		$objs = $objs->get();	
+		
+		//dd($objs->toArray());
 		$headers = [
 			[
 				'text'=>'Ref',
@@ -53,7 +64,8 @@ class SaleController extends Controller
 			],
 			[
 				'text'=>'Customer',
-				'value'=>'customer'
+				'value'=>'customer',
+				'sortable'=>false
 			],
 			[
 				'text'=>'Status',
@@ -61,15 +73,17 @@ class SaleController extends Controller
 			],
 			[
 				'text'=>'Created By',
-				'value'=>'created_by'
+				'value'=>'created_by',
+				'sortable'=>false
 			],
 			[
 				'text'=>'Date',
-				'value'=>'date'
+				'value'=>'created_at'
 			],
 			[
 				'text'=>'Actions',
-				'value'=>'actions'
+				'value'=>'actions',
+				'sortable'=>false
 			]
 		];
 		$items = [];
@@ -80,7 +94,7 @@ class SaleController extends Controller
 				'customer'=>($obj->customer_id == 0 ? '' : $obj->customer->name),
 				'status'=>$obj->status,
 				'created_by'=>$obj->user->name,
-				'date'=>$date->toFormattedDateString(),
+				'created_at'=>$date->toFormattedDateString(),
 				'actions' =>[
 					'actions'=>1,
                     'view'=>1,
